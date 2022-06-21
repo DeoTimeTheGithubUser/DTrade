@@ -31,7 +31,6 @@ public class TradeGui extends Gui {
 
     @Override
     public void onClick(InventoryClickEvent event) {
-        System.out.println(GuiUtils.ItemStackEquals(event.getInventory().getItem(event.getSlot()), event.getInventory().getItem(event.getSlot() + 1), true));
         if(isOtherTraderSlot(event.getSlot())) {
             event.setCancelled(true);
             return;
