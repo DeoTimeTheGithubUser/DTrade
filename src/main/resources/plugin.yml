@@ -7,3 +7,6 @@ commands:
   trade:
     usage: "/trade [player name]"
     description: "sends a trade request to a player"
+  compare:
+    usage: "/compare"
+    description: "test"

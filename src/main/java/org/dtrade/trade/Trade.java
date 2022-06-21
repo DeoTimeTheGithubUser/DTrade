@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import net.minecraft.world.inventory.Container;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.dtrade.gui.guis.TradeGui;

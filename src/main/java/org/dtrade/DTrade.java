@@ -1,6 +1,7 @@
 package org.dtrade;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.dtrade.commands.CompareMenu;
 import org.dtrade.commands.TradeRequests;
 import org.dtrade.gui.management.GuiManager;
 
@@ -16,6 +17,7 @@ public class DTrade extends JavaPlugin {
     public void onEnable() {
 
         new TradeRequests();
+        new CompareMenu();
         new GuiManager();
 
     }
