@@ -7,11 +7,17 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor
 public class Trader {
 
-    private final Player delegate;
+    private final Player player;
     private ItemStack[] offeredItems;
     private boolean acceptedTrade = false;
+
+    public void toggleAccept() {
+        acceptedTrade = !acceptedTrade;
+    }
 
     public static Trader createTrader(Player trader) {
         return new Trader(trader);
     }
+
+
 }
