@@ -1,4 +1,6 @@
 package org.dtrade;
 
-public class DTrade {
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class DTrade extends JavaPlugin {
 }
