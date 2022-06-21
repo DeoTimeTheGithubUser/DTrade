@@ -17,6 +17,12 @@ public class Trade {
 
     private final TradeCouple couple;
 
+    public void cancel(Trader canceller) {
+        couple.both((t) -> {
+            t.getPlayer().sendMessage(t.equals(canceller) ? "\u00a7cYou cancelled the trade." : "\u00a7c" + canceller.getPlayer().getName() + " cancelled the trade.");
+        });
+    }
+
     public static Trade createTrade(TradeCouple couple) {
         Trade trade = new Trade(couple);
         trades.add(trade);
