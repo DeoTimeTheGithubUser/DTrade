@@ -1,10 +1,11 @@
 package org.dtrade.trade;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor @Data
 public class Trader {
 
     private final Player player;
