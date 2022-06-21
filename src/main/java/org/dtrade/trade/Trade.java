@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
+import org.dtrade.gui.guis.TradeGui;
+import org.dtrade.gui.management.GuiManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,9 +19,21 @@ public class Trade {
 
     private final TradeCouple couple;
 
+    private boolean cancelled;
+
     public void cancel(Trader canceller) {
+        cancelled = true;
         couple.both((t) -> {
             t.getPlayer().sendMessage(t.equals(canceller) ? "\u00a7cYou cancelled the trade." : "\u00a7c" + canceller.getPlayer().getName() + " cancelled the trade.");
+            if (!t.equals(canceller)) t.getPlayer().closeInventory();
+            trades.remove(this);
+        });
+    }
+
+    public void initializeTrade() {
+        couple.both((t) -> {
+            t.getPlayer().openInventory(new TradeGui(this));
+            t.getPlayer().sendMessage("\u00a7aYou are now trading with " + couple.other(t).getPlayer().getName() + ".");
         });
     }
 

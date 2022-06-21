@@ -27,7 +27,9 @@ public class Trader {
     }
 
     public static Trader createTrader(Player trader) {
-        return new Trader(trader);
+        Trader trader1 = new Trader(trader);
+        TRADERS.add(trader1);
+        return trader1;
     }
 
     public static Trader getTrader(Player trader) {

@@ -24,4 +24,8 @@ public class TradeCouple {
         return new TradeCouple(trader1, trader2);
     }
 
+    public Trader other(Trader trader) {
+        return trader.equals(trader1) ? trader2 : trader1;
+    }
+
 }

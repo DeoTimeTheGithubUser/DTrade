@@ -7,15 +7,18 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
+import org.dtrade.DTrade;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class GuiManager implements Listener {
+
     private static GuiManager instance;
 
-    GuiManager() {
+    public GuiManager() {
         instance = this;
+        DTrade.getInstance().getServer().getPluginManager().registerEvents(this, DTrade.getInstance());
     }
 
     public static GuiManager getGuiManager() {
@@ -40,6 +43,7 @@ public class GuiManager implements Listener {
     private void onInventoryClick(InventoryClickEvent event) {
         final Gui Gui = findGui(event.getClickedInventory());
         if(Gui != null) Gui.onClick(event);
+
     }
 
     @EventHandler
@@ -53,7 +57,7 @@ public class GuiManager implements Listener {
     }
 
     // Finds a Gui given a normal Inventory
-    private Gui findGui(Inventory inventory) {
+    public Gui findGui(Inventory inventory) {
         if(!(inventory instanceof Gui)) return null;
         return this.GUIS
                 .stream()
