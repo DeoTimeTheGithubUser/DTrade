@@ -1,14 +1,9 @@
 package org.dtrade.trade;
 
-import com.google.common.base.Preconditions;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import net.minecraft.world.inventory.Container;
-import org.bukkit.BanList;
-import org.bukkit.Bukkit;
 import org.dtrade.gui.guis.TradeGui;
-import org.dtrade.gui.management.GuiManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +42,7 @@ public class Trade {
     @SneakyThrows
     public static Trade getTradeOf(Trader trader) {
         Trade[] possibleTrades =  trades.stream()
-                .filter(t -> t.getCouple().hasTrader(trader))
+                .filter(t -> t.getCouple().has(trader))
                 .toArray(Trade[]::new);
         if(possibleTrades.length > 1) throw new MultiTradeException(trader);
         return possibleTrades.length == 0 ? null : possibleTrades[0];

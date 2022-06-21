@@ -41,7 +41,7 @@ public class GuiManager implements Listener {
 
     @EventHandler
     private void onInventoryClick(InventoryClickEvent event) {
-        final Gui Gui = findGui(event.getClickedInventory());
+        final Gui Gui = findGui(event.getInventory());
         if(Gui != null) Gui.onClick(event);
 
     }

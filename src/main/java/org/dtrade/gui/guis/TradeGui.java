@@ -1,10 +1,12 @@
 package org.dtrade.gui.guis;
 
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.gui.management.GuiUtils;
@@ -31,15 +33,30 @@ public class TradeGui extends Gui {
 
     @Override
     public void onClick(InventoryClickEvent event) {
-        if(isOtherTraderSlot(event.getSlot())) {
-            event.setCancelled(true);
-            return;
+        event.setCancelled(true);
+        Trader trader = Trader.getTrader((Player) event.getWhoClicked());
+        int slot = event.getSlot();
+        if(isOtherTraderSlot(event.getSlot())) return;
+        if(!trader.getPlayer().getOpenInventory().getTopInventory().equals(this)) {
+            ItemStack offeredItem = event.getCurrentItem();
+            if(offeredItem == null) return;
+            trader.getPlayer().getInventory().setItem(slot, null);
+            trader.addTradeItem(offeredItem);
+        } else {
+            Bukkit.broadcastMessage(String.valueOf(convertSlotToTradeIndex(slot)));
+            if(trader.getOfferedItems().size() < slot) return;
+            ItemStack removedItem = trader.getOfferedItems().get(slot);
+            trader.removeTradeItem(removedItem);
         }
     }
 
     @Override
     public void onClose(InventoryCloseEvent close) {
         if (!trade.isCancelled()) trade.cancel(Trader.getTrader((Player) close.getPlayer()));
+    }
+
+    private static int convertSlotToTradeIndex(int slot) {
+        return ((slot / 9) * 4) + (slot % 9);
     }
 
     private static boolean isOtherTraderSlot(int slot) {

@@ -13,12 +13,13 @@ import org.dtrade.trade.TradeCouple;
 import org.dtrade.trade.Trader;
 
 import java.util.HashMap;
+import java.util.UUID;
 
-public class TradeRequests implements CommandExecutor, Listener {
+public class CommandTrade implements CommandExecutor, Listener {
 
-    private HashMap<Player, Player> requests = new HashMap<Player, Player>();
+    private HashMap<UUID, UUID> requests = new HashMap<>();
 
-    public TradeRequests() {
+    public CommandTrade() {
         DTrade.getInstance().getServer().getPluginManager().registerEvents(this, DTrade.getInstance());
         DTrade.getInstance().getCommand("trade").setExecutor(this);
     }
@@ -43,22 +44,22 @@ public class TradeRequests implements CommandExecutor, Listener {
             return true;
         }
 
-        if (requests.containsKey(player)) {
+        if (requests.containsKey(player.getUniqueId())) {
             sender.sendMessage("\u00a7cYou already have an outgoing request.");
             return true;
         }
 
-        if (requests.containsKey(requested)) {
+        if (requests.containsKey(requested.getUniqueId())) {
 
             Trade trade = Trade.createTrade(TradeCouple.of(Trader.createTrader(player), Trader.createTrader(requested)));
 
             trade.initializeTrade();
-            requests.remove(requested);
+            requests.remove(requested.getUniqueId());
 
             return true;
         }
 
-        requests.put(player, requested);
+        requests.put(player.getUniqueId(), requested.getUniqueId());
         player.sendMessage("\u00a7aYou sent a trade request to " + args[0] + ".");
         requested.sendMessage("\u00a7aYou recieved a trade request from " + sender.getName() + "."); // hover command todo
 

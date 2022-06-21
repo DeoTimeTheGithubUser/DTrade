@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor @Data
@@ -14,16 +16,19 @@ public class Trader {
     private static final Set<Trader> TRADERS = new HashSet<>();
 
     private final Player player;
-    private ItemStack[] offeredItems;
+    private final List<ItemStack> offeredItems = new LinkedList<>();
     private boolean acceptedTrade = false;
 
     public void toggleAccept() {
         acceptedTrade = !acceptedTrade;
     }
 
-    // CALL THIS ON PLAYER LEAVE EVENT
-    public void remove() {
-        TRADERS.remove(this);
+    public void addTradeItem(ItemStack itemStack) {
+        offeredItems.add(itemStack);
+    }
+
+    public void removeTradeItem(ItemStack itemStack) {
+        offeredItems.remove(itemStack);
     }
 
     public static Trader createTrader(Player trader) {
