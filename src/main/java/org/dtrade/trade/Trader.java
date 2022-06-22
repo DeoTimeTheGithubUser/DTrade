@@ -23,6 +23,10 @@ public class Trader {
         acceptedTrade = !acceptedTrade;
     }
 
+    public void remove() {
+        TRADERS.remove(this);
+    }
+
     public void addTradeItem(ItemStack itemStack) {
         offeredItems.add(itemStack);
     }
