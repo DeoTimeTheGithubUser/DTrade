@@ -1,5 +1,6 @@
 package org.dtrade.trade;
 
+import com.google.common.collect.Queues;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -7,14 +8,15 @@ import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.server.level.EntityPlayer;
 import org.apache.commons.lang3.text.translate.UnicodeUnescaper;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.dtrade.gui.guis.TradeGui;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor @Data
 public class Trade {
@@ -30,6 +32,17 @@ public class Trade {
         cancelled = true;
         trades.removeIf(t -> t.getTradeID().equals(tradeID));
         couple.both(t -> {
+            Player player = t.getPlayer();
+            List<ItemStack> offeredItems = t.getOfferedItems();
+
+            for(ItemStack item : offeredItems) {
+                if(player.getInventory().firstEmpty() != -1) player.getInventory().addItem(item);
+                else {
+                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                    player.sendMessage("\u00a7cYour inventory was full so an item was dropped.");
+                }
+            }
+
             t.remove();
             t.getPlayer().sendMessage(t.equals(canceller) ? "\u00a7cYou cancelled the trade." : "\u00a7c" + canceller.getPlayer().getName() + " cancelled the trade.");
             if (!t.equals(canceller)) t.getPlayer().closeInventory();

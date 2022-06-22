@@ -2,6 +2,7 @@ package org.dtrade.trade;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +22,8 @@ public class Trader {
 
     public void toggleAccept() {
         acceptedTrade = !acceptedTrade;
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 100f, 1f);
+        Trade.getTradeOf(this).getCouple().both((t) -> t.getPlayer().updateInventory());
     }
 
     public void remove() {
@@ -36,10 +39,10 @@ public class Trader {
         offeredItems.remove(itemStack);
     }
 
-    public static Trader createTrader(Player trader) {
-        Trader trader1 = new Trader(trader);
-        TRADERS.add(trader1);
-        return trader1;
+    public static Trader createTrader(Player player) {
+        Trader trader = new Trader(player);
+        TRADERS.add(trader);
+        return trader;
     }
 
     public static Trader getTrader(Player trader) {

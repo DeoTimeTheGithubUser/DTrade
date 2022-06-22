@@ -1,6 +1,9 @@
 package org.dtrade.util;
 
-public class TradeUtils {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public final class TradeUtils {
 
     public static int convertSlotToTradeIndex(int slot) {
         return ((slot / 9) * 4) + (slot % 9);
