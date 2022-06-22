@@ -24,6 +24,7 @@ public class Trader {
     }
 
     public void remove() {
+        offeredItems.clear();
         TRADERS.remove(this);
     }
 

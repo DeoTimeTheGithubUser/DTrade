@@ -67,9 +67,9 @@ public class CommandTrade implements CommandExecutor, Listener {
         player.sendMessage("\u00a7aYou sent a trade request to " + args[0] + ".");
 
         String sendMessage = "\u00a7aYou recieved a trade request from " + sender.getName() + ".";
-        TextComponent component = ChatUtils.createCommandMessage(sendMessage, "/trade " + requested.getName());
+        TextComponent component = ChatUtils.createCommandMessage(sendMessage, "/trade " + player.getName());
         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("\u00a7aClick to accept trade!")));
-        requested.sendMessage(sendMessage);
+        requested.spigot().sendMessage(component);
 
         return true;
     }

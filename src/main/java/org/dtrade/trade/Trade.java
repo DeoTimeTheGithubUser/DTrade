@@ -27,16 +27,12 @@ public class Trade {
     private boolean cancelled;
 
     public void cancel(@NotNull Trader canceller) {
-        PacketPlayOutSetSlot a;
         cancelled = true;
-        Bukkit.broadcastMessage("BEFORE LENGTH: " + trades.size());
         trades.removeIf(t -> t.getTradeID().equals(tradeID));
-        Bukkit.broadcastMessage("AFTER LENGTH: " + trades.size());
-        Bukkit.broadcastMessage(String.format("Trade %s cancelled by %s", tradeID, canceller.getPlayer().getName()));
         couple.both(t -> {
+            t.remove();
             t.getPlayer().sendMessage(t.equals(canceller) ? "\u00a7cYou cancelled the trade." : "\u00a7c" + canceller.getPlayer().getName() + " cancelled the trade.");
             if (!t.equals(canceller)) t.getPlayer().closeInventory();
-            t.remove();
         });
     }
 

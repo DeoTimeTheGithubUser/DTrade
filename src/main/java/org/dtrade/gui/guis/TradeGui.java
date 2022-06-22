@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.trade.Trade;
@@ -48,6 +49,11 @@ public class TradeGui extends Gui {
             trader.removeTradeItem(removedItem);
             trader.getPlayer().getInventory().addItem(removedItem);
         }
+    }
+
+    @Override
+    public void onOpen(InventoryOpenEvent event) {
+        if(trade.isCancelled()) event.setCancelled(true);
     }
 
     @Override
