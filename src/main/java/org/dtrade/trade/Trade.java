@@ -3,10 +3,15 @@ package org.dtrade.trade;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
+import net.minecraft.server.level.EntityPlayer;
 import org.apache.commons.lang3.text.translate.UnicodeUnescaper;
 import org.bukkit.Bukkit;
 import org.dtrade.gui.guis.TradeGui;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -21,7 +26,8 @@ public class Trade {
 
     private boolean cancelled;
 
-    public void cancel(Trader canceller) {
+    public void cancel(@NotNull Trader canceller) {
+        PacketPlayOutSetSlot a;
         cancelled = true;
         Bukkit.broadcastMessage("BEFORE LENGTH: " + trades.size());
         trades.removeIf(t -> t.getTradeID().equals(tradeID));
@@ -41,7 +47,7 @@ public class Trade {
         });
     }
 
-    public static Trade createTrade(TradeCouple couple) {
+    public static @NotNull Trade createTrade(TradeCouple couple) {
         Bukkit.broadcastMessage(String.format("Trade created with %s and %s", couple.getTrader1().getPlayer().getName(), couple.getTrader2().getPlayer().getName()));
         Trade trade = new Trade(couple);
         trades.add(trade);
@@ -50,7 +56,7 @@ public class Trade {
 
 
     @SneakyThrows
-    public static Trade getTradeOf(Trader trader) {
+    public static @Nullable Trade getTradeOf(Trader trader) {
         Trade[] possibleTrades =  trades.stream()
                 .filter(t -> t.getCouple().has(trader))
                 .toArray(Trade[]::new);

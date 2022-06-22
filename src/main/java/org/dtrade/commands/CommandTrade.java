@@ -1,6 +1,9 @@
 package org.dtrade.commands;
 
 import com.sun.jna.platform.win32.WinNT;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,6 +14,7 @@ import org.dtrade.DTrade;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.TradeCouple;
 import org.dtrade.trade.Trader;
+import org.dtrade.util.ChatUtils;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -61,7 +65,11 @@ public class CommandTrade implements CommandExecutor, Listener {
 
         requests.put(player.getUniqueId(), requested.getUniqueId());
         player.sendMessage("\u00a7aYou sent a trade request to " + args[0] + ".");
-        requested.sendMessage("\u00a7aYou recieved a trade request from " + sender.getName() + "."); // hover command todo
+
+        String sendMessage = "\u00a7aYou recieved a trade request from " + sender.getName() + ".";
+        TextComponent component = ChatUtils.createCommandMessage(sendMessage, "/trade " + requested.getName());
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("\u00a7aClick to accept trade!")));
+        requested.sendMessage(sendMessage);
 
         return true;
     }
