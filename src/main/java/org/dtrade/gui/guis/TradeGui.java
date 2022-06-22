@@ -35,20 +35,22 @@ public class TradeGui extends Gui {
         event.setCancelled(true);
         Trader trader = Trader.getTrader((Player) event.getWhoClicked());
         int slot = event.getSlot();
-        if(TradeUtils.isOtherTraderSlot(event.getSlot()) || TradeUtils.isMiddle(event.getSlot())) return;
         if(event.getClickedInventory() == null) return;
         if (event.getClickedInventory().equals(trader.getPlayer().getInventory())) {
             ItemStack offeredItem = event.getCurrentItem();
             if(offeredItem == null) return;
             trader.getPlayer().getInventory().setItem(slot, null);
             trader.addTradeItem(offeredItem);
+            trade.getCouple().other(trader).getPlayer().updateInventory();
         } else if (event.getClickedInventory().equals(this)){
-            Bukkit.broadcastMessage(String.valueOf(TradeUtils.convertSlotToTradeIndex(slot)));
-            if(trader.getOfferedItems().isEmpty() || trader.getOfferedItems().size() < slot) return;
-            ItemStack removedItem = trader.getOfferedItems().get(slot);
+            if(TradeUtils.isOtherTraderSlot(event.getSlot()) || TradeUtils.isMiddle(event.getSlot())) return;
+            if(trader.getOfferedItems().isEmpty() || trader.getOfferedItems().size() <= slot) return;
+            ItemStack removedItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(slot));
             trader.removeTradeItem(removedItem);
             trader.getPlayer().getInventory().addItem(removedItem);
+            trade.getCouple().other(trader).getPlayer().updateInventory();
         }
+        ((Player) event.getWhoClicked()).updateInventory();
     }
 
     @Override
