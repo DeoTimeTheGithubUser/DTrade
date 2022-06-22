@@ -12,6 +12,7 @@ import org.dtrade.gui.management.Gui;
 import org.dtrade.gui.management.GuiUtils;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.Trader;
+import org.dtrade.util.TradeUtils;
 
 
 public class TradeGui extends Gui {
@@ -36,7 +37,7 @@ public class TradeGui extends Gui {
         event.setCancelled(true);
         Trader trader = Trader.getTrader((Player) event.getWhoClicked());
         int slot = event.getSlot();
-        if(isOtherTraderSlot(event.getSlot())) return;
+        if(TradeUtils.isOtherTraderSlot(event.getSlot()) || TradeUtils.isMiddle(event.getSlot())) return;
         if(event.getClickedInventory() == null) return;
         if (event.getClickedInventory().equals(trader.getPlayer().getInventory())) {
             ItemStack offeredItem = event.getCurrentItem();
@@ -44,7 +45,7 @@ public class TradeGui extends Gui {
             trader.getPlayer().getInventory().setItem(slot, null);
             trader.addTradeItem(offeredItem);
         } else if (event.getClickedInventory().equals(this)){
-            Bukkit.broadcastMessage(String.valueOf(convertSlotToTradeIndex(slot)));
+            Bukkit.broadcastMessage(String.valueOf(TradeUtils.convertSlotToTradeIndex(slot)));
             if(trader.getOfferedItems().isEmpty() || trader.getOfferedItems().size() < slot) return;
             ItemStack removedItem = trader.getOfferedItems().get(slot);
             trader.removeTradeItem(removedItem);
@@ -55,14 +56,6 @@ public class TradeGui extends Gui {
     @Override
     public void onClose(InventoryCloseEvent close) {
         if (!trade.isCancelled()) trade.cancel(Trader.getTrader((Player) close.getPlayer()));
-    }
-
-    private static int convertSlotToTradeIndex(int slot) {
-        return ((slot / 9) * 4) + (slot % 9);
-    }
-
-    private static boolean isOtherTraderSlot(int slot) {
-        return slot % 9 >= 4;
     }
 
 }
