@@ -54,9 +54,9 @@ public class TradeView implements Listener {
 
                         ItemStack slotDisplayItem = new ItemStack(Material.AIR);
 
-                        if (!TradeUtils.isOtherTraderSlot(slot) && trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(slot))
+                        if (!TradeUtils.isOtherTraderSlot(slot) && trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(slot) && slot != -1)
                             slotDisplayItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(slot));
-                        else if (trade.getCouple().other(trader).getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(slot))
+                        else if (trade.getCouple().other(trader).getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(slot) && slot != -1)
                             slotDisplayItem = trade.getCouple().other(trader).getOfferedItems().get(TradeUtils.convertOtherSlotToTradeIndex(slot));
 
                         net.minecraft.world.item.ItemStack display = CraftItemStack.asNMSCopy(slotDisplayItem);
@@ -86,7 +86,7 @@ public class TradeView implements Listener {
 
                             ItemStack slotDisplayItem = CraftItemStack.asBukkitCopy(items.get(i));
 
-                            if (!TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isOtherTraderSlot(i)) {
+                            if (!TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isMiddle(i)) {
                                 if (trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(i))
                                     slotDisplayItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(i));
                             } else if (!TradeUtils.isMiddle(i)) {
