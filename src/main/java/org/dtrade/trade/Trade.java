@@ -63,7 +63,7 @@ public class Trade {
 
 
     @SneakyThrows
-    public static @Nullable Trade getTradeOf(Trader trader) {
+    public static Trade getTradeOf(Trader trader) {
         Trade[] possibleTrades =  trades.stream()
                 .filter(t -> t.getCouple().has(trader))
                 .toArray(Trade[]::new);

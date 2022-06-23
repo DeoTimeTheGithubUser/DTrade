@@ -42,7 +42,7 @@ public class TradeView implements Listener {
                     if (packet instanceof PacketPlayOutSetSlot) {
 
                         Trader trader = Trader.getTrader(e.getPlayer());
-                        Trade trade = Trade.getTradeOf(trader);
+                        Trade trade = trader.getTrade();
                         if(trade == null) {
                             super.write(channelHandlerContext, o, channelPromise);
                             return;
@@ -72,7 +72,7 @@ public class TradeView implements Listener {
                     } else if (packet instanceof PacketPlayOutWindowItems) {
 
                         Trader trader = Trader.getTrader(e.getPlayer());
-                        Trade trade = Trade.getTradeOf(trader);
+                        Trade trade = trader.getTrade();
 
                         if (trader == null) {
                             super.write(channelHandlerContext, o, channelPromise);

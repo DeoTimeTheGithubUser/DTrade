@@ -23,8 +23,8 @@ public class TradeGui extends Gui {
     public static final int SIZE = 54;
 
     public TradeGui(Trader trader) {
-        super("Trading with " + Trade.getTradeOf(trader).getCouple().other(trader).getPlayer().getName(), SIZE);
-        this.trade = Trade.getTradeOf(trader);
+        super("Trading with " + trader.getTrade().getCouple().other(trader).getPlayer().getName(), SIZE);
+        this.trade = trader.getTrade();
         this.trader = trader;
         this.otherTrader = trade.getCouple().other(trader);
     }

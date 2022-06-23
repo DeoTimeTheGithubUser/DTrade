@@ -5,23 +5,34 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor @Data
 public class Trader {
 
     private static final Set<Trader> TRADERS = new HashSet<>();
 
+    @NotNull
+    private final Trade trade = ((Supplier<Trade>) () -> {
+        Trade t = Trade.getTradeOf(this);
+        if(t == null) {
+            remove();
+            throw new IllegalStateException("Trader has no trade.");
+        }
+        return t;
+    }).get();
+
     private final Player player;
     private final List<ItemStack> offeredItems = new LinkedList<>();
     private boolean acceptedTrade = false;
 
     public void toggleAccept() {
-        Trade trade = Trade.getTradeOf(this);
         acceptedTrade = !acceptedTrade;
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 100f, 1f);
         trade.getCouple().both((t) -> t.getPlayer().updateInventory());
