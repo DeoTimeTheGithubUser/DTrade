@@ -5,15 +5,19 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public interface Couple<T> {
+
+    T getFirst();
+    T getSecond();
+
     boolean has(T t);
     void both(Consumer<T> action);
     T other(T t);
 
-    default boolean meets(Predicate<T> pred) {
-        AtomicBoolean met = new AtomicBoolean(false);
-        both((t) -> {
-            if(pred.test(t)) met.set(true);
-        });
-        return met.get();
+    default boolean oneMeets(Predicate<T> pred) {
+        return pred.test(getFirst()) || pred.test(getSecond());
+    }
+
+    default boolean bothMeet(Predicate<T> pred) {
+        return pred.test(getFirst()) && pred.test(getSecond());
     }
 }

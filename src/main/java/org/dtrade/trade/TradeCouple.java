@@ -13,6 +13,16 @@ public class TradeCouple implements Couple<Trader> {
     private final Trader trader2;
 
     @Override
+    public Trader getFirst() {
+        return trader1;
+    }
+
+    @Override
+    public Trader getSecond() {
+        return trader2;
+    }
+
+    @Override
     public boolean has(Trader trader) {
         return trader1.equals(trader) || trader2.equals(trader);
     }

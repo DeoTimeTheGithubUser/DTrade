@@ -1,14 +1,9 @@
 package org.dtrade.trade;
 
-import com.google.common.collect.Queues;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
-import net.minecraft.server.level.EntityPlayer;
-import org.apache.commons.lang3.text.translate.UnicodeUnescaper;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,7 +12,6 @@ import org.dtrade.gui.guis.TradeGui;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 @RequiredArgsConstructor @Data
@@ -78,7 +72,7 @@ public class Trade {
     }
 
     public boolean isTradeAccepted() {
-        return couple.meets(Trader::isAcceptedTrade);
+        return couple.bothMeet(Trader::isAcceptedTrade);
     }
 
     public void updateTradeAccepted() {

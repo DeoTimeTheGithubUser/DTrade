@@ -7,16 +7,13 @@ import lombok.experimental.ExtensionMethod;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.network.protocol.game.PacketPlayOutWindowItems;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
-import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.dtrade.gui.guis.TradeGui;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.Trader;
@@ -25,7 +22,6 @@ import org.dtrade.util.ReflectUtils;
 import org.dtrade.util.TradeUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 @ExtensionMethod({ItemUtils.class})
@@ -127,7 +123,7 @@ public class TradeView implements Listener {
     private static ItemStack createAcceptButton(Trade trade, Trader trader) {
         Trader otherTrader = trade.getCouple().other(trader);
         ItemStack acceptTradeButton = new ItemStack(Material.AIR);
-        acceptTradeButton.setType(trade.getCouple().meets(Trader::isAcceptedTrade) ? Material.GREEN_WOOL : Material.RED_WOOL);
+        acceptTradeButton.setType(trade.getCouple().oneMeets(Trader::isAcceptedTrade) ? Material.GREEN_WOOL : Material.RED_WOOL);
 
         acceptTradeButton.setDisplayName("\u00a7aAccept trade");
         acceptTradeButton.clearLore();
