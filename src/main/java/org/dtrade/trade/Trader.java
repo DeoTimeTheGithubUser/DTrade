@@ -21,9 +21,11 @@ public class Trader {
     private boolean acceptedTrade = false;
 
     public void toggleAccept() {
+        Trade trade = Trade.getTradeOf(this);
         acceptedTrade = !acceptedTrade;
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 100f, 1f);
-        Trade.getTradeOf(this).getCouple().both((t) -> t.getPlayer().updateInventory());
+        trade.getCouple().both((t) -> t.getPlayer().updateInventory());
+        trade.updateTradeAccepted();
     }
 
     public void remove() {

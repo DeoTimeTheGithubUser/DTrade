@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.dtrade.DTrade;
 import org.dtrade.gui.guis.TradeGui;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +29,8 @@ public class Trade {
     private final TradeCouple couple;
 
     private boolean cancelled;
+
+    private int secondsUntilAccept = -1;
 
     public void cancel(@NotNull Trader canceller) {
         cancelled = true;
@@ -72,5 +76,52 @@ public class Trade {
         if(possibleTrades.length > 1) throw new MultiTradeException(trader, possibleTrades);
         return possibleTrades.length == 0 ? null : possibleTrades[0];
     }
+
+    public boolean isTradeAccepted() {
+        return couple.meets(Trader::isAcceptedTrade);
+    }
+
+    public void updateTradeAccepted() {
+        if (!isTradeAccepted()) return;
+
+        secondsUntilAccept = 5;
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                if (!isTradeAccepted()) {
+                    secondsUntilAccept = -1;
+                    couple.both(t -> {
+                        t.getPlayer().updateInventory();
+                    });
+                    this.cancel();
+                    return;
+                }
+
+                couple.both(t -> {
+                    t.getPlayer().updateInventory();
+                });
+
+                if (secondsUntilAccept == 0) {
+                    confirmTrade();
+                    this.cancel();
+                    secondsUntilAccept = -1;
+                    return;
+                }
+
+                secondsUntilAccept--;
+
+            }
+
+        }.runTaskTimer(DTrade.getInstance(), 0L, 20L);
+
+    }
+
+    private void confirmTrade() {
+        Bukkit.broadcastMessage("Trade accepted");
+    }
+
 
 }

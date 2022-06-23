@@ -137,6 +137,7 @@ public class TradeView implements Listener {
         else if(otherTrader.isAcceptedTrade()) lore = "\u00a77" + otherTrader.getPlayer().getName() + " has accepted the trade.";
         else lore = "\u00a77No one accepted the trade.";
         acceptTradeButton.addLore(lore);
+        acceptTradeButton.setAmount(trade.getSecondsUntilAccept() == -1 ? 1 : trade.getSecondsUntilAccept());
 
         if(trader.isAcceptedTrade() && otherTrader.isAcceptedTrade()) acceptTradeButton.addGlint();
 
