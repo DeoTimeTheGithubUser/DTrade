@@ -41,24 +41,21 @@ public class TradeView implements Listener {
 
                     if (packet instanceof PacketPlayOutSetSlot) {
 
-                        Trader trader = Trader.getTrader(e.getPlayer());
-                        Trade trade = trader.getTrade();
-                        if(trade == null) {
-                            super.write(channelHandlerContext, o, channelPromise);
-                            return;
-                        }
-
                         Field slotField = PacketPlayOutSetSlot.class.getDeclaredField("e");
                         slotField.setAccessible(true);
-
                         int slot = (int) slotField.get(packet);
 
-                        if(slot == 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
-                        if (slot % 9 == 4 && slot != 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMenuGlass()));
+                        Trader trader = Trader.getTrader(e.getPlayer());
                         if (trader == null || TradeUtils.isMiddle(slot)) {
                             super.write(channelHandlerContext, o, channelPromise);
                             return;
                         }
+                        Trade trade = trader.getTrade();
+
+
+                        if(slot == 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
+                        if (slot % 9 == 4 && slot != 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMenuGlass()));
+
                         ItemStack slotDisplayItem = new ItemStack(Material.AIR);
 
                         if (!TradeUtils.isOtherTraderSlot(slot) && trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(slot) && slot != -1)
