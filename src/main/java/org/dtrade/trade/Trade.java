@@ -4,8 +4,11 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.dtrade.DTrade;
 import org.dtrade.gui.guis.TradeGui;
@@ -14,17 +17,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-@RequiredArgsConstructor @Data
+@Data
 public class Trade {
 
     private static final Set<Trade> trades = new HashSet<>();
 
     private final UUID tradeID = UUID.randomUUID();
+
+    private final Plugin plugin;
     private final TradeCouple couple;
 
     private boolean cancelled;
 
     private int secondsUntilAccept = -1;
+
+    public Trade(Plugin plugin, TradeCouple couple) {
+        this.plugin = plugin;
+        this.couple = couple;
+    }
 
     public void cancel(@NotNull Trader canceller) {
         cancelled = true;
@@ -54,10 +64,10 @@ public class Trade {
         });
     }
 
-    public static @NotNull Trade createTrade(TradeCouple couple) {
-        Bukkit.broadcastMessage(String.format("Trade created with %s and %s", couple.getTrader1().getPlayer().getName(), couple.getTrader2().getPlayer().getName()));
-        Trade trade = new Trade(couple);
+    public static @NotNull Trade createTrade(Plugin plugin, TradeCouple couple) {
+        Trade trade = new Trade(plugin, couple);
         trades.add(trade);
+        couple.both(t -> t.setTrade(trade));
         return trade;
     }
 
@@ -109,12 +119,19 @@ public class Trade {
 
             }
 
-        }.runTaskTimer(DTrade.getInstance(), 0L, 20L);
+        }.runTaskTimer(plugin, 0L, 20L);
 
     }
 
     private void confirmTrade() {
-        Bukkit.broadcastMessage("Trade accepted");
+        cancelled = true;
+        couple.both(t -> {
+            t.getPlayer().closeInventory();
+            t.getPlayer().playSound(t.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100f, 1f);
+            t.getPlayer().sendMessage("\u00a7aCompleted trade with " + couple.other(t).getPlayer().getName() + "!");
+            couple.other(t).getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
+            t.remove();
+        });
     }
 
 

@@ -7,10 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor @Data
@@ -18,15 +15,8 @@ public class Trader {
 
     private static final Set<Trader> TRADERS = new HashSet<>();
 
-    @NotNull
-    private final Trade trade = ((Supplier<Trade>) () -> {
-        Trade t = Trade.getTradeOf(this);
-        if(t == null) {
-            remove();
-            throw new IllegalStateException("Trader has no trade.");
-        }
-        return t;
-    }).get();
+    private transient Trade trade;
+    private final UUID traderID = UUID.randomUUID();
 
     private final Player player;
     private final List<ItemStack> offeredItems = new LinkedList<>();
@@ -42,6 +32,7 @@ public class Trader {
     public void remove() {
         offeredItems.clear();
         TRADERS.remove(this);
+        System.out.println("Removed trader " + traderID);
     }
 
     public void addTradeItem(ItemStack itemStack) {
@@ -55,6 +46,7 @@ public class Trader {
     public static Trader createTrader(Player player) {
         Trader trader = new Trader(player);
         TRADERS.add(trader);
+        System.out.println("Created trader " + trader.getTraderID());
         return trader;
     }
 

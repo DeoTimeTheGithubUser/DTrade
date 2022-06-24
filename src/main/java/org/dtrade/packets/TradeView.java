@@ -35,7 +35,21 @@ public class TradeView implements Listener {
             @Override
             public void write(ChannelHandlerContext channelHandlerContext, Object o, ChannelPromise channelPromise) throws Exception{
 
+
                 Packet<?> packet = (Packet<?>) o;
+
+                Trader trader = null;
+
+                if (packet instanceof PacketPlayOutSetSlot || packet instanceof PacketPlayOutWindowItems) trader = Trader.getTrader(e.getPlayer());
+
+                if(trader == null) {
+                    super.write(channelHandlerContext, o, channelPromise);
+                    return;
+                }
+
+
+                Trade trade = trader.getTrade();
+
 
                 try {
 
@@ -45,12 +59,11 @@ public class TradeView implements Listener {
                         slotField.setAccessible(true);
                         int slot = (int) slotField.get(packet);
 
-                        Trader trader = Trader.getTrader(e.getPlayer());
-                        if (trader == null || TradeUtils.isMiddle(slot)) {
+                        if (TradeUtils.isMiddle(slot) || trade.isCancelled()) {
                             super.write(channelHandlerContext, o, channelPromise);
                             return;
                         }
-                        Trade trade = trader.getTrade();
+
 
 
                         if(slot == 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
@@ -58,23 +71,23 @@ public class TradeView implements Listener {
 
                         ItemStack slotDisplayItem = new ItemStack(Material.AIR);
 
-                        if (!TradeUtils.isOtherTraderSlot(slot) && trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(slot) && slot != -1)
-                            slotDisplayItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(slot));
-                        else if (trade.getCouple().other(trader).getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(slot) && slot != -1)
-                            slotDisplayItem = trade.getCouple().other(trader).getOfferedItems().get(TradeUtils.convertOtherSlotToTradeIndex(slot));
+                        int convertedSlot = TradeUtils.convertOtherSlotToTradeIndex(slot);
+                        if(convertedSlot < 0) {
+                            super.write(channelHandlerContext, o, channelPromise);
+                            return;
+                        }
+
+                        if (!TradeUtils.isOtherTraderSlot(slot) && trader.getOfferedItems().size() > convertedSlot)
+                            slotDisplayItem = trader.getOfferedItems().get(convertedSlot);
+                        else if (trade.getCouple().other(trader).getOfferedItems().size() > convertedSlot)
+                            slotDisplayItem = trade.getCouple().other(trader).getOfferedItems().get(convertedSlot);
 
                         net.minecraft.world.item.ItemStack display = CraftItemStack.asNMSCopy(slotDisplayItem);
 
                         ReflectUtils.setField(packet, "f", display);
-                    } else if (packet instanceof PacketPlayOutWindowItems) {
+                    } else {
 
-                        Trader trader = Trader.getTrader(e.getPlayer());
-                        Trade trade = trader.getTrade();
 
-                        if (trader == null) {
-                            super.write(channelHandlerContext, o, channelPromise);
-                            return;
-                        }
 
                         Field slotsField = PacketPlayOutWindowItems.class.getDeclaredField("c");
                         slotsField.setAccessible(true);
@@ -130,7 +143,7 @@ public class TradeView implements Listener {
         else if(otherTrader.isAcceptedTrade()) lore = "\u00a77" + otherTrader.getPlayer().getName() + " has accepted the trade.";
         else lore = "\u00a77No one accepted the trade.";
         acceptTradeButton.addLore(lore);
-        acceptTradeButton.setAmount(trade.getSecondsUntilAccept() == -1 ? 1 : trade.getSecondsUntilAccept());
+        acceptTradeButton.setAmount(trade.getSecondsUntilAccept() == -1 ? 1 : trade.getSecondsUntilAccept() + 1);
 
         if(trader.isAcceptedTrade() && otherTrader.isAcceptedTrade()) acceptTradeButton.addGlint();
 

@@ -2,28 +2,20 @@ package org.dtrade;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import org.dtrade.commands.CommandTrade;
+import org.dtrade.gui.management.Gui;
 import org.dtrade.gui.management.GuiManager;
 import org.dtrade.packets.TradeView;
 
 public class DTrade extends JavaPlugin {
 
-    static DTrade instance;
-
-    public DTrade() {
-        instance = this;
-    }
-
     @Override
     public void onEnable() {
 
-        new CommandTrade();
-        new GuiManager();
-        getServer().getPluginManager().registerEvents(new TradeView(), DTrade.getInstance());
+        getServer().getPluginManager().registerEvents(new GuiManager(), this);
+        getServer().getPluginManager().registerEvents(new TradeView(), this);
 
-    }
+        getCommand("trade").setExecutor(new CommandTrade(this));
 
-    public static DTrade getInstance() {
-        return instance;
     }
 
 }

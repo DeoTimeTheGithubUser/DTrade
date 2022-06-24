@@ -1,6 +1,7 @@
 package org.dtrade.commands;
 
 import com.sun.jna.platform.win32.WinNT;
+import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -10,6 +11,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.dtrade.DTrade;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.TradeCouple;
@@ -19,14 +21,12 @@ import org.dtrade.util.ChatUtils;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class CommandTrade implements CommandExecutor, Listener {
+@RequiredArgsConstructor
+public class CommandTrade implements CommandExecutor {
 
     private HashMap<UUID, UUID> requests = new HashMap<>();
 
-    public CommandTrade() {
-        DTrade.getInstance().getServer().getPluginManager().registerEvents(this, DTrade.getInstance());
-        DTrade.getInstance().getCommand("trade").setExecutor(this);
-    }
+    private final Plugin plugin;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -55,7 +55,7 @@ public class CommandTrade implements CommandExecutor, Listener {
 
         if (requests.containsKey(requested.getUniqueId())) {
 
-            Trade trade = Trade.createTrade(TradeCouple.of(Trader.createTrader(player), Trader.createTrader(requested)));
+            Trade trade = Trade.createTrade(plugin, TradeCouple.of(Trader.createTrader(player), Trader.createTrader(requested)));
 
             trade.initializeTrade();
             requests.remove(requested.getUniqueId());

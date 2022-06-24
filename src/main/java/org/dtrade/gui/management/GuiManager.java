@@ -18,7 +18,6 @@ public class GuiManager implements Listener {
 
     public GuiManager() {
         instance = this;
-        DTrade.getInstance().getServer().getPluginManager().registerEvents(this, DTrade.getInstance());
     }
 
     public static GuiManager getGuiManager() {
