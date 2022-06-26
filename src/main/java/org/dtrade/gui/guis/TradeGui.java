@@ -1,17 +1,25 @@
 package org.dtrade.gui.guis;
 
 import lombok.experimental.ExtensionMethod;
-import org.bukkit.Material;
+import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
+import net.minecraft.world.inventory.Containers;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.gui.management.Gui;
+import org.dtrade.packets.SignInput;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.Trader;
 import org.dtrade.util.ItemUtils;
 import org.dtrade.util.TradeUtils;
+
+import java.util.Arrays;
 
 @ExtensionMethod({ItemUtils.class})
 public class TradeGui extends Gui {
@@ -38,6 +46,24 @@ public class TradeGui extends Gui {
             trader.toggleAccept();
             return;
         }
+        if(slot == 40) {
+            SignInput.requestSignInput(trade.getPlugin(), trader.getPlayer(), new String[]{"Are you", "a silly", "goose?"}).thenAccept(input -> {
+                trader.getPlayer().sendMessage("You typed " + Arrays.toString(input));
+
+                // weird hack
+                trader.setToReopen(true);
+                trader.getPlayer().openInventory(this);
+                // window id doesnt work
+//                int windowID = WindowIDUtils.getWindowID(trader.getPlayer());
+//                Containers<?> type = ((CraftPlayer) trader.getPlayer()).getHandle().bV.a();
+//                IChatBaseComponent title = new ChatMessage(trader.getPlayer().getOpenInventory().getTitle());
+//                PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(windowID, type, title);
+//
+//                Bukkit.getScheduler().scheduleSyncDelayedTask(trade.getPlugin(), () -> ((CraftPlayer) trader.getPlayer()).getHandle().b.a(packet), 1);
+//                Bukkit.getScheduler().scheduleSyncDelayedTask(trade.getPlugin(), () -> trader.getPlayer().updateInventory(), 2);
+            });
+            return;
+        }
         if (event.getClickedInventory().equals(trader.getPlayer().getInventory())) {
             ItemStack offeredItem = event.getCurrentItem();
             if(offeredItem == null) return;
@@ -52,6 +78,7 @@ public class TradeGui extends Gui {
             trader.removeTradeItem(removedItem);
             trader.getPlayer().getInventory().addItem(removedItem);
             trade.getCouple().other(trader).getPlayer().updateInventory();
+            Bukkit.getOfflinePlayer("example");
         }
         trader.getPlayer().updateInventory();
     }
@@ -62,8 +89,14 @@ public class TradeGui extends Gui {
     }
 
     @Override
-    public void onClose(InventoryCloseEvent close) {
-        if (!trade.isCancelled()) trade.cancel(Trader.getTrader((Player) close.getPlayer()));
+    public void onClose(InventoryCloseEvent event) {
+        Trader trader = Trader.getTrader((Player) event.getPlayer());
+        if(trader.isToReopen()) {
+            trader.setToReopen(false);
+            trader.getPlayer().openInventory(this);
+            return;
+        }
+        if (!trade.isCancelled()) trade.cancel(Trader.getTrader((Player) event.getPlayer()));
     }
 
 }

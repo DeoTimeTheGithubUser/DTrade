@@ -20,7 +20,11 @@ public class Trader {
 
     private final Player player;
     private final List<ItemStack> offeredItems = new LinkedList<>();
+    private long offeredCoins = 0;
     private boolean acceptedTrade = false;
+
+    // TODO make this packet based (window ids arent working)
+    private boolean toReopen = false;
 
     public void toggleAccept() {
         acceptedTrade = !acceptedTrade;
