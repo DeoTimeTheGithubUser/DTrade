@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.packets.SignInput;
@@ -51,16 +52,15 @@ public class TradeGui extends Gui {
                 trader.getPlayer().sendMessage("You typed " + Arrays.toString(input));
 
                 // weird hack
-                trader.setToReopen(true);
-                trader.getPlayer().openInventory(this);
                 // window id doesnt work
-//                int windowID = WindowIDUtils.getWindowID(trader.getPlayer());
-//                Containers<?> type = ((CraftPlayer) trader.getPlayer()).getHandle().bV.a();
-//                IChatBaseComponent title = new ChatMessage(trader.getPlayer().getOpenInventory().getTitle());
-//                PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(windowID, type, title);
-//
-//                Bukkit.getScheduler().scheduleSyncDelayedTask(trade.getPlugin(), () -> ((CraftPlayer) trader.getPlayer()).getHandle().b.a(packet), 1);
-//                Bukkit.getScheduler().scheduleSyncDelayedTask(trade.getPlugin(), () -> trader.getPlayer().updateInventory(), 2);
+                int windowID = ((CraftPlayer) trader.getPlayer()).getHandle().bV.j;
+                Containers<?> type = ((CraftPlayer) trader.getPlayer()).getHandle().bV.a();
+                IChatBaseComponent title = new ChatMessage(trader.getPlayer().getOpenInventory().getTitle());
+                PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(windowID, type, title);
+
+                ((CraftPlayer) trader.getPlayer()).getHandle().b.a(packet);
+                trader.getPlayer().updateInventory();
+
             });
             return;
         }
@@ -91,11 +91,6 @@ public class TradeGui extends Gui {
     @Override
     public void onClose(InventoryCloseEvent event) {
         Trader trader = Trader.getTrader((Player) event.getPlayer());
-        if(trader.isToReopen()) {
-            trader.setToReopen(false);
-            trader.getPlayer().openInventory(this);
-            return;
-        }
         if (!trade.isCancelled()) trade.cancel(Trader.getTrader((Player) event.getPlayer()));
     }
 

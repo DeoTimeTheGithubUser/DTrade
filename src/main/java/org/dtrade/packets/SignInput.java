@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.plugin.Plugin;
+import org.dtrade.util.ReflectUtils;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
@@ -71,7 +72,7 @@ public class SignInput {
 
         IChatBaseComponent[] comp = CraftSign.sanitizeLines(this.prompt);
         TileEntitySign sign = new TileEntitySign(new BlockPosition(x, y, z), data);
-        System.arraycopy(comp, 0, sign.d, 0, sign.d.length);
+        ReflectUtils.setField(sign, "d", comp);
 
         PacketPlayOutOpenSignEditor signPacket = new PacketPlayOutOpenSignEditor(pos);
         ((CraftPlayer) player).getHandle().b.a(blockPacket);

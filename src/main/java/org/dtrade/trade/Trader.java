@@ -23,9 +23,6 @@ public class Trader {
     private long offeredCoins = 0;
     private boolean acceptedTrade = false;
 
-    // TODO make this packet based (window ids arent working)
-    private boolean toReopen = false;
-
     public void toggleAccept() {
         acceptedTrade = !acceptedTrade;
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 100f, 1f);
