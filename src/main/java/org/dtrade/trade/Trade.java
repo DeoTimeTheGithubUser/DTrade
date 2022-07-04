@@ -1,8 +1,7 @@
 package org.dtrade.trade;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -11,6 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.dtrade.DTrade;
+import org.dtrade.EconomyHandler;
 import org.dtrade.gui.guis.TradeGui;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -124,15 +124,52 @@ public class Trade {
     }
 
     private void confirmTrade() {
+
+        class Interrupt {
+            @Getter
+            private String reason;
+            @Getter
+            private boolean interrupted = false;
+
+            public void setReason(String reason) {
+                interrupted = true;
+                this.reason = reason;
+            }
+
+            public void send(Player player) {
+                player.sendMessage("\u00a7c" + reason);
+            }
+        }
+
         cancelled = true;
+        Interrupt interrupt = new Interrupt();
+        Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
         couple.both(t -> {
+            if(interrupt.isInterrupted()) {
+                interrupt.send(t.getPlayer());
+                return;
+            }
+            Trader partner = couple.other(t);
             t.getPlayer().closeInventory();
+            if(!t.hasCoins(t.getOfferedCoins())) {
+                interrupt.setReason("Not enough coins.");
+                interrupt.send(t.getPlayer());
+                return;
+            }
+
+            long receivedCoins = partner.getOfferedCoins();
+
             t.getPlayer().playSound(t.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100f, 1f);
-            t.getPlayer().sendMessage("\u00a7aCompleted trade with " + couple.other(t).getPlayer().getName() + "!");
-            couple.other(t).getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
+            t.getPlayer().sendMessage("\u00a7aCompleted trade with " + partner.getPlayer().getName() + "!");
+            if(receivedCoins != 0) t.getPlayer().sendMessage("\u00a7aYou received \u00a7e" + receivedCoins + "\u00a7a!");
+            partner.getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
+            eco.depositPlayer(partner.getPlayer(), receivedCoins);
             t.remove();
         });
     }
+
+
+
 
 
 }

@@ -7,10 +7,14 @@ import org.dtrade.packets.PacketHandler;
 import org.dtrade.packets.TradeView;
 import org.dtrade.util.Utils;
 
+import java.sql.PreparedStatement;
+import java.util.logging.Logger;
+
 public class DTrade extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
 
         PacketHandler.init(this);
         EconomyHandler.init(this);

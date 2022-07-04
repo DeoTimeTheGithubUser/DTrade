@@ -2,9 +2,11 @@ package org.dtrade.trade;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.dtrade.EconomyHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -42,6 +44,12 @@ public class Trader {
 
     public void removeTradeItem(ItemStack itemStack) {
         offeredItems.remove(itemStack);
+    }
+
+    public boolean hasCoins(double amount) {
+        Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
+        double bal = eco.getBalance(getPlayer());
+        return bal >= amount;
     }
 
     public static Trader createTrader(Player player) {

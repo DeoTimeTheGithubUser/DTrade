@@ -48,11 +48,18 @@ public class TradeGui extends Gui {
             return;
         }
         if(slot == 40) {
-            SignInput.requestSignInput(trade.getPlugin(), trader.getPlayer(), new String[]{"Are you", "a silly", "goose?"}).thenAccept(input -> {
-                trader.getPlayer().sendMessage("You typed " + Arrays.toString(input));
+            SignInput.requestSignInput(trade.getPlugin(), trader.getPlayer(), new String[]{"Are you", "a silly", "goose?"}).thenAccept(lines -> {
+                String input = lines[0];
+                boolean valid;
+                Long amount = null;
+                try {
+                    amount = Long.parseLong(input);
+                    valid = true;
+                } catch (NumberFormatException ex) {
+                    valid = false;
+                }
+                if(valid && amount < 0) valid = false;
 
-                // weird hack
-                // window id doesnt work
                 int windowID = ((CraftPlayer) trader.getPlayer()).getHandle().bV.j;
                 Containers<?> type = ((CraftPlayer) trader.getPlayer()).getHandle().bV.a();
                 IChatBaseComponent title = new ChatMessage(trader.getPlayer().getOpenInventory().getTitle());
@@ -60,6 +67,12 @@ public class TradeGui extends Gui {
 
                 ((CraftPlayer) trader.getPlayer()).getHandle().b.a(packet);
                 trader.getPlayer().updateInventory();
+
+                if(valid) {
+                    if(!trader.hasCoins(amount)) trader.getPlayer().sendMessage("\u00a7cYou do not have enough coins!");
+                    else trader.setOfferedCoins(amount);
+                }
+                else trader.getPlayer().sendMessage("\u00a7cInvalid coin input!");
 
             });
             return;

@@ -70,13 +70,14 @@ public class TradeView {
     }
 
     private PacketHandler.PacketWriteSubscriber<PacketPlayOutWindowItems> getWindowItemsWriter() {
-        return new PacketHandler.PacketWriteSubscriber<PacketPlayOutWindowItems>() {
-            @Override @SneakyThrows
+        return new PacketHandler.PacketWriteSubscriber<>() {
+            @Override
+            @SneakyThrows
             public void onWrite(Player player, PacketPlayOutWindowItems packet) {
                 Trader trader = Trader.getTrader(player);
-                if(trader == null) return;
+                if (trader == null) return;
                 Trade trade = trader.getTrade();
-                if(trade == null || trade.isCancelled()) return;
+                if (trade == null || trade.isCancelled()) return;
                 boolean econEnabled = EconomyHandler.getEconomyHandler().supportsEconomy();
                 Field slotsField = PacketPlayOutWindowItems.class.getDeclaredField("c");
                 slotsField.setAccessible(true);
@@ -100,8 +101,9 @@ public class TradeView {
 
                     items.set(i, display);
                 }
-                for (int i = 0; i < TradeGui.SIZE; i++) if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(createMenuGlass()));
-                if(econEnabled) items.set(40, CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
+                for (int i = 0; i < TradeGui.SIZE; i++)
+                    if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(createMenuGlass()));
+                if (econEnabled) items.set(40, CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                 items.set(49, CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
                 slotsField.set(packet, items);
             }
@@ -133,7 +135,6 @@ public class TradeView {
     }
 
     private static ItemStack createMoneyButton(Trade trade, Trader trader) {
-        System.out.println("create money button");
         Trader otherTrader = trade.getCouple().other(trader);
         ItemStack moneyButton = new ItemStack(Material.GOLD_INGOT);
         moneyButton
