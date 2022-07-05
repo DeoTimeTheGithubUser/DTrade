@@ -32,19 +32,22 @@ public final class TradeUtils {
     }
 
 
-    public static BaseComponent[] getTradeReceipt(Trader trader, boolean received) {
+    public static String getTradeReceipt(Trader trader, boolean received) {
         Trader target = received ? trader.getTrade().getCouple().other(trader) : trader;
 
-        ComponentBuilder builder = new ComponentBuilder();
-        builder.append("\u00a7aCoins: \u00a7e" + target.getOfferedCoins());
-        builder.append("");
-        builder.append("\u00a7aItems:");
-        target.getOfferedItems().forEach(item -> {
-            TextComponent comp = new TextComponent("\u00a77• " + ItemUtils.getRealName(item) + " \u00a78x" + item.getAmount());
-            comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(null, 1, ItemTag.ofNbt(item.getNbt()))));
-            builder.append(comp);
-        });
-        return builder.create();
+        List<String> lines = new ArrayList<>();
+        lines.add("\u00a7aCoins: \u00a7e" + target.getOfferedCoins());
+        lines.add("");
+        lines.add("\u00a7aItems:");
+        for (ItemStack item : target.getOfferedItems()) {
+            lines.add("\u00a77• " + ItemUtils.getRealName(item) + " \u00a78x" + item.getAmount());
+        }
+        if (target.getOfferedItems().size() == 0) lines.add("\u00a78none");
+        String combined = "";
+        for (String s : lines) {
+            combined += s + "\n";
+        }
+        return combined.substring(0, combined.length() - 1);
     }
 
 }
