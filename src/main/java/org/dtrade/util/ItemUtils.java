@@ -57,4 +57,9 @@ public final class ItemUtils {
         return WordUtils.capitalize(item.getType().toString().replace('_', ' ').toLowerCase());
     }
 
+    public static String getNbt(ItemStack item) {
+        net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
+        return nms.u().toString();
+    }
+
 }

@@ -1,7 +1,6 @@
 package org.dtrade.trade;
 
 import lombok.*;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -11,15 +10,11 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.dtrade.DTrade;
 import org.dtrade.EconomyHandler;
 import org.dtrade.gui.guis.TradeGui;
-import org.dtrade.util.ChatUtils;
 import org.dtrade.util.TradeUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -170,11 +165,11 @@ public class Trade {
 
             String tradedReceipt = "\u00a77[\u00a7aTraded Receipt\u00a77]\u00a7a";
             TextComponent tComponent = new TextComponent(tradedReceipt);
-            tComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTraderTradedReceipt(t))));
+            tComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTradeReceipt(t, false))));
 
             String receivedReceipt = "\u00a77[\u00a7aReceived Receipt\u00a77]\u00a7a";
             TextComponent rComponent = new TextComponent(receivedReceipt);
-            rComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTraderReceivedReceipt(t))));
+            rComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTradeReceipt(t, true))));
 
             t.getPlayer().spigot().sendMessage(complete, tComponent, new TextComponent("\u00a78 | "), rComponent);
 
