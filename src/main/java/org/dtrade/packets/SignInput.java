@@ -73,6 +73,7 @@ public class SignInput {
         IChatBaseComponent[] comp = CraftSign.sanitizeLines(this.prompt);
         TileEntitySign sign = new TileEntitySign(new BlockPosition(x, y, z), data);
         ReflectUtils.setField(sign, "d", comp);
+        ReflectUtils.setField(sign, "e", comp);
 
         PacketPlayOutOpenSignEditor signPacket = new PacketPlayOutOpenSignEditor(pos);
         ((CraftPlayer) player).getHandle().b.a(blockPacket);

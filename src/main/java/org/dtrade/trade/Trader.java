@@ -33,9 +33,7 @@ public class Trader {
     }
 
     public void remove() {
-        offeredItems.clear();
-        TRADERS.remove(this);
-        System.out.println("Removed trader " + traderID);
+        TRADERS.removeIf(t -> t.traderID.equals(traderID));
     }
 
     public void addTradeItem(ItemStack itemStack) {
@@ -55,13 +53,11 @@ public class Trader {
     public static Trader createTrader(Player player) {
         Trader trader = new Trader(player);
         TRADERS.add(trader);
-        System.out.println("Created trader " + trader.getTraderID());
         return trader;
     }
 
     public static Trader getTrader(Player trader) {
         return TRADERS.stream().filter(t -> t.getPlayer().equals(trader)).findFirst().orElse(null);
     }
-
 
 }

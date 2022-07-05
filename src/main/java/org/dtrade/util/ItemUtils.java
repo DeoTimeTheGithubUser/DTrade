@@ -1,6 +1,8 @@
 package org.dtrade.util;
 
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -46,6 +48,13 @@ public final class ItemUtils {
         meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
         item.setItemMeta(meta);
         return item;
+    }
+
+    public static String getRealName(ItemStack item) {
+        if (item.getItemMeta() != null) {
+            if (item.getItemMeta().hasDisplayName()) return item.getItemMeta().getDisplayName();
+        }
+        return WordUtils.capitalize(item.getType().toString().replace('_', ' ').toLowerCase());
     }
 
 }

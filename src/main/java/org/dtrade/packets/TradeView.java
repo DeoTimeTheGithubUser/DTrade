@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.ExtensionMethod;
 import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.network.protocol.game.PacketPlayOutWindowItems;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
@@ -35,13 +36,20 @@ public class TradeView {
                 if(trader == null) return;
                 Trade trade = trader.getTrade();
                 if(trade == null || trade.isCancelled()) return;
+
                 boolean econEnabled = EconomyHandler.getEconomyHandler().supportsEconomy();
+
                 Field slotField = PacketPlayOutSetSlot.class.getDeclaredField("e");
                 slotField.setAccessible(true);
                 int slot = (int) slotField.get(packet);
 
+                Field cField = PacketPlayOutSetSlot.class.getDeclaredField("c");
+                cField.setAccessible(true);
+                int c = (int) cField.get(packet);
+
+                if (c == 0 || slot > 53) return;
+
                 if (TradeUtils.isMiddle(slot)) {
-                    System.out.println("set 1");
                     if(slot == 40 && econEnabled) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                     else if(slot == 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
                     else if (slot % 9 == 4) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMenuGlass()));
@@ -127,7 +135,7 @@ public class TradeView {
         else if(otherTrader.isAcceptedTrade()) lore = "\u00a77" + otherTrader.getPlayer().getName() + " has accepted the trade.";
         else lore = "\u00a77No one accepted the trade.";
         acceptTradeButton.addLore(lore);
-        acceptTradeButton.setAmount(trade.getSecondsUntilAccept() == -1 ? 1 : trade.getSecondsUntilAccept() + 1);
+        acceptTradeButton.setAmount((trade.getSecondsUntilAccept() == -1 || !trade.isTradeAccepted()) ? 1 : trade.getSecondsUntilAccept() + 1);
 
         if(trader.isAcceptedTrade() && otherTrader.isAcceptedTrade()) acceptTradeButton.addGlint();
 

@@ -1,6 +1,10 @@
 package org.dtrade.trade;
 
 import lombok.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -12,6 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.dtrade.DTrade;
 import org.dtrade.EconomyHandler;
 import org.dtrade.gui.guis.TradeGui;
+import org.dtrade.util.ChatUtils;
+import org.dtrade.util.TradeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +44,7 @@ public class Trade {
 
     public void cancel(@NotNull Trader canceller) {
         cancelled = true;
-        trades.removeIf(t -> t.getTradeID().equals(tradeID));
+        trades.removeIf(t -> t.getCouple().equals(couple));
         couple.both(t -> {
             Player player = t.getPlayer();
             List<ItemStack> offeredItems = t.getOfferedItems();
@@ -95,25 +101,23 @@ public class Trade {
             @Override
             public void run() {
 
+
                 if (!isTradeAccepted()) {
                     secondsUntilAccept = -1;
-                    couple.both(t -> {
-                        t.getPlayer().updateInventory();
-                    });
+                    couple.both(t -> Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> t.getPlayer().updateInventory(), 1L));
                     this.cancel();
                     return;
                 }
 
-                couple.both(t -> {
-                    t.getPlayer().updateInventory();
-                });
+                couple.both(t -> Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> t.getPlayer().updateInventory(), 1L));
 
                 if (secondsUntilAccept == 0) {
                     confirmTrade();
                     this.cancel();
                     secondsUntilAccept = -1;
+                    couple.both(t -> t.getPlayer().playSound(t.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100f, 1f));
                     return;
-                }
+                } else couple.both(t -> t.getPlayer().playSound(t.getPlayer().getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 100f, 1f));
 
                 secondsUntilAccept--;
 
@@ -158,18 +162,29 @@ public class Trade {
             }
 
             long receivedCoins = partner.getOfferedCoins();
+            long offeredCoins = t.getOfferedCoins();
 
             t.getPlayer().playSound(t.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100f, 1f);
-            t.getPlayer().sendMessage("\u00a7aCompleted trade with " + partner.getPlayer().getName() + "!");
-            if(receivedCoins != 0) t.getPlayer().sendMessage("\u00a7aYou received \u00a7e" + receivedCoins + "\u00a7a!");
+
+            TextComponent complete = new TextComponent("\u00a77Completed trade with \u00a7a" + partner.getPlayer().getName() + "\u00a77!\n");
+
+            String tradedReceipt = "\u00a77[\u00a7aTraded Receipt\u00a77]\u00a7a";
+            TextComponent tComponent = new TextComponent(tradedReceipt);
+            tComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTraderTradedReceipt(t))));
+
+            String receivedReceipt = "\u00a77[\u00a7aReceived Receipt\u00a77]\u00a7a";
+            TextComponent rComponent = new TextComponent(receivedReceipt);
+            rComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTraderReceivedReceipt(t))));
+
+            t.getPlayer().spigot().sendMessage(complete, tComponent, new TextComponent("\u00a78 | "), rComponent);
+
             partner.getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
-            eco.depositPlayer(partner.getPlayer(), receivedCoins);
+            eco.depositPlayer(t.getPlayer(), receivedCoins);
+            eco.withdrawPlayer(t.getPlayer(), offeredCoins);
+            t.setTrade(null);
             t.remove();
         });
+        trades.removeIf(t -> t.getCouple().equals(couple));
     }
-
-
-
-
 
 }
