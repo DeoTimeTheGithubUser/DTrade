@@ -39,13 +39,16 @@ public class TradeView {
 
                 boolean econEnabled = EconomyHandler.getEconomyHandler().supportsEconomy();
 
-                Field slotField = PacketPlayOutSetSlot.class.getDeclaredField("e");
-                slotField.setAccessible(true);
-                int slot = (int) slotField.get(packet);
+                int slot = (int) ReflectUtils.getField(packet, "e");
+//                Field slotField = PacketPlayOutSetSlot.class.getDeclaredField("e");
+//                slotField.setAccessible(true);
+//                int slot = (int) slotField.get(packet);
 
-                Field cField = PacketPlayOutSetSlot.class.getDeclaredField("c");
-                cField.setAccessible(true);
-                int c = (int) cField.get(packet);
+                int c = (int) ReflectUtils.getField(packet, "c");
+
+//                Field cField = PacketPlayOutSetSlot.class.getDeclaredField("c");
+//                cField.setAccessible(true);
+//                int c = (int) cField.get(packet);
 
                 if (c == 0 || slot > 53) return;
 
@@ -81,17 +84,15 @@ public class TradeView {
         return new PacketHandler.PacketWriteSubscriber<>() {
             @Override
             @SneakyThrows
+            @SuppressWarnings("unchecked")
             public void onWrite(Player player, PacketPlayOutWindowItems packet) {
                 Trader trader = Trader.getTrader(player);
                 if (trader == null) return;
                 Trade trade = trader.getTrade();
                 if (trade == null || trade.isCancelled()) return;
                 boolean econEnabled = EconomyHandler.getEconomyHandler().supportsEconomy();
-                Field slotsField = PacketPlayOutWindowItems.class.getDeclaredField("c");
-                slotsField.setAccessible(true);
-
-
-                List<net.minecraft.world.item.ItemStack> items = (List<net.minecraft.world.item.ItemStack>) slotsField.get(packet);
+                List<net.minecraft.world.item.ItemStack> items = (List<net.minecraft.world.item.ItemStack>)
+                        ReflectUtils.getField(packet, "c");
 
                 for (int i = 0; i < items.size(); i++) {
 
@@ -113,7 +114,7 @@ public class TradeView {
                     if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(createMenuGlass()));
                 if (econEnabled) items.set(40, CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                 items.set(49, CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
-                slotsField.set(packet, items);
+                ReflectUtils.setField(packet, "c", items);
             }
         };
     }
