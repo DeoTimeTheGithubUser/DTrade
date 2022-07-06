@@ -55,7 +55,7 @@ public class GuiTradeLogs extends Gui {
     @Override
     public void onClick(InventoryClickEvent event) {
         event.setCancelled(true);
-        int slot = event.getSlot();
+        int slot = event.getRawSlot();
         if (slot == 48 && page != 0) {
             event.getWhoClicked().openInventory(new GuiTradeLogs(target, page - 1));
             return;
