@@ -17,6 +17,9 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.util.logging.Logger;
 
+// TODO multi-version support
+// TODO config options
+
 public class DTrade extends JavaPlugin {
 
     @Getter
@@ -39,6 +42,8 @@ public class DTrade extends JavaPlugin {
         getCommand("tradelog").setExecutor(new CommandTradeLog());
 
     }
+
+
 
     @Override
     public void onDisable() {
