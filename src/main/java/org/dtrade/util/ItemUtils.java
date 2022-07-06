@@ -1,7 +1,9 @@
 package org.dtrade.util;
 
+import lombok.experimental.ExtensionMethod;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -57,9 +59,12 @@ public final class ItemUtils {
         return WordUtils.capitalize(item.getType().toString().replace('_', ' ').toLowerCase());
     }
 
-    public static String getNbt(ItemStack item) {
-        net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
-        return nms.u().toString();
+    public static ItemStack createMenuGlass() {
+        return setDisplayName(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), "");
+    }
+
+    public static ItemStack createGui(Material material, String name) {
+        return setDisplayName(new ItemStack(material), name);
     }
 
 }

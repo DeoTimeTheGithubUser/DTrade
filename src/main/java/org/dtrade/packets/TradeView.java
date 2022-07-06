@@ -4,20 +4,18 @@ import lombok.SneakyThrows;
 import lombok.experimental.ExtensionMethod;
 import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.network.protocol.game.PacketPlayOutWindowItems;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.EconomyHandler;
-import org.dtrade.gui.guis.TradeGui;
+import org.dtrade.gui.guis.GuiTrade;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.Trader;
 import org.dtrade.util.ItemUtils;
 import org.dtrade.util.ReflectUtils;
 import org.dtrade.util.TradeUtils;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 @ExtensionMethod({ItemUtils.class})
@@ -55,7 +53,7 @@ public class TradeView {
                 if (TradeUtils.isMiddle(slot)) {
                     if(slot == 40 && econEnabled) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                     else if(slot == 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
-                    else if (slot % 9 == 4) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMenuGlass()));
+                    else if (slot % 9 == 4) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(ItemUtils.createMenuGlass()));
                     return;
                 }
 
@@ -110,17 +108,13 @@ public class TradeView {
 
                     items.set(i, display);
                 }
-                for (int i = 0; i < TradeGui.SIZE; i++)
-                    if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(createMenuGlass()));
+                for (int i = 0; i < GuiTrade.SIZE; i++)
+                    if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(ItemUtils.createMenuGlass()));
                 if (econEnabled) items.set(40, CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                 items.set(49, CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
                 ReflectUtils.setField(packet, "c", items);
             }
         };
-    }
-
-    private static ItemStack createMenuGlass() {
-        return new ItemStack(Material.BLACK_STAINED_GLASS_PANE).setDisplayName(" ");
     }
 
     private static ItemStack createAcceptButton(Trade trade, Trader trader) {

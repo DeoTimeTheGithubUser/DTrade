@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +29,7 @@ public class PacketHandler {
     private final Map<Class<? extends Packet<?>>, Set<PacketReadSubscriber<? extends Packet<?>>>> readers = new HashMap<>();
     private final Map<Class<? extends Packet<?>>, Set<PacketWriteSubscriber<? extends Packet<?>>>> writers = new HashMap<>();
 
-    private PacketHandler(Plugin plugin) {
+    private PacketHandler(@NotNull Plugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(packetListener, plugin);
     }
 
@@ -51,25 +52,29 @@ public class PacketHandler {
     private final Listener packetListener = new Listener() {
         @EventHandler
         private void onJoin(PlayerJoinEvent event) {
-            ((CraftPlayer) event.getPlayer()).getHandle().b.a.m.pipeline().addBefore("packet_handler", "dpackethandler", new ChannelDuplexHandler() {
-                @Override @SuppressWarnings("unchecked")
-                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                    Packet<?> packet = (Packet<?>) msg;
-                    Class<?> clazz = packet.getClass();
-                    if(readers.containsKey(clazz)) readers.get(clazz).forEach(s -> ((PacketReadSubscriber) s).onRead(event.getPlayer(), packet));
-                    super.channelRead(ctx, msg);
-                }
-
-                @Override @SuppressWarnings("unchecked")
-                public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-                    Packet<?> packet = (Packet<?>) msg;
-                    Class<?> clazz = packet.getClass();
-                    if(writers.containsKey(clazz)) writers.get(clazz).forEach(s -> ((PacketWriteSubscriber) s).onWrite(event.getPlayer(), packet));
-                    super.write(ctx, msg, promise);
-                }
-            });
+            registerPlayer(event.getPlayer());
         }
     };
+
+    public void registerPlayer(Player player) {
+        ((CraftPlayer) player).getHandle().b.a.m.pipeline().addBefore("packet_handler", "dpackethandler", new ChannelDuplexHandler() {
+            @Override @SuppressWarnings("unchecked")
+            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                Packet<?> packet = (Packet<?>) msg;
+                Class<?> clazz = packet.getClass();
+                if(readers.containsKey(clazz)) readers.get(clazz).forEach(s -> ((PacketReadSubscriber) s).onRead(player, packet));
+                super.channelRead(ctx, msg);
+            }
+
+            @Override @SuppressWarnings("unchecked")
+            public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+                Packet<?> packet = (Packet<?>) msg;
+                Class<?> clazz = packet.getClass();
+                if(writers.containsKey(clazz)) writers.get(clazz).forEach(s -> ((PacketWriteSubscriber) s).onWrite(player, packet));
+                super.write(ctx, msg, promise);
+            }
+        });
+    }
 
     public static void init(Plugin plugin) {
         packetHandler = new PacketHandler(plugin);

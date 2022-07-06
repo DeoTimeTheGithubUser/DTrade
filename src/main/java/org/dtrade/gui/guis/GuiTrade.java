@@ -24,7 +24,7 @@ import org.dtrade.util.TradeUtils;
 import java.util.Arrays;
 
 @ExtensionMethod({ItemUtils.class})
-public class TradeGui extends Gui {
+public class GuiTrade extends Gui {
 
     private final Trade trade;
     private final Trader trader;
@@ -32,7 +32,7 @@ public class TradeGui extends Gui {
 
     public static final int SIZE = 54;
 
-    public TradeGui(Trader trader) {
+    public GuiTrade(Trader trader) {
         super("Trading with " + trader.getTrade().getCouple().other(trader).getPlayer().getName(), SIZE);
         this.trade = trader.getTrade();
         this.trader = trader;
@@ -106,7 +106,6 @@ public class TradeGui extends Gui {
 
     @Override
     public void onClose(InventoryCloseEvent event) {
-        Trader trader = Trader.getTrader((Player) event.getPlayer());
         if (!trade.isCancelled()) trade.cancel(Trader.getTrader((Player) event.getPlayer()));
     }
 

@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.plugin.Plugin;
 import org.dtrade.util.ReflectUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
@@ -85,7 +86,7 @@ public class SignInput {
         });
     }
 
-    public static CompletableFuture<String[]> requestSignInput (Plugin plugin, Player player, String[] prompt) {
+    public static @NotNull CompletableFuture<String[]> requestSignInput (@NotNull Plugin plugin, Player player, String[] prompt) {
         CompletableFuture<String[]> future = new CompletableFuture<>();
         new SignInput(plugin, player, prompt, future);
         return future;

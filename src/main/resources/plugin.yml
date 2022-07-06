@@ -6,8 +6,14 @@ depend: ["Vault"]
 
 commands:
   trade:
-    usage: "/trade [player name]"
-    description: "sends a trade request to a player"
-  compare:
-    usage: "/compare"
-    description: "test"
+    usage: /trade [player name]
+    description: sends a trade request to a player
+  tradelog:
+    permission: dtrade.tradelog
+    usage: /tradelog [player name]
+    description: Views the trade logs of a player
+
+permissions:
+  dtrade.tradelog:
+    description: Allows viewing a players trade logs
+    default: op

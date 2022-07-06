@@ -20,7 +20,15 @@ public final class TradeUtils {
     }
 
     public static int convertOtherSlotToTradeIndex(int slot) {
-        return ((slot / 9) * 4) + (slot % 9) - 5;
+        return (((slot / 9) * 4) + (slot % 9)) - 5;
+    }
+
+    public static int convertTradeIndexToSlot(int index) {
+        return ((index / 4) * 9) + (index % 4);
+    }
+
+    public static int convertOtherTradeIndexToSlot(int index) {
+        return (((index / 4) * 9) + (index % 4)) + 5;
     }
 
     public static boolean isMiddle(int slot) {
@@ -30,7 +38,6 @@ public final class TradeUtils {
     public static boolean isOtherTraderSlot(int slot) {
         return slot % 9 > 4;
     }
-
 
     public static String getTradeReceipt(Trader trader, boolean received) {
         Trader target = received ? trader.getTrade().getCouple().other(trader) : trader;

@@ -12,11 +12,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.dtrade.EconomyHandler;
-import org.dtrade.gui.guis.TradeGui;
+import org.dtrade.gui.guis.GuiTrade;
+import org.dtrade.logging.TradeLog;
+import org.dtrade.logging.TradeLogger;
 import org.dtrade.util.TradeUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @Data
 public class Trade {
@@ -60,7 +63,7 @@ public class Trade {
 
     public void initializeTrade() {
         couple.both((t) -> {
-            t.getPlayer().openInventory(new TradeGui(t));
+            t.getPlayer().openInventory(new GuiTrade(t));
             t.getPlayer().sendMessage("\u00a7aYou are now trading with " + couple.other(t).getPlayer().getName() + ".");
         });
     }
@@ -70,16 +73,6 @@ public class Trade {
         trades.add(trade);
         couple.both(t -> t.setTrade(trade));
         return trade;
-    }
-
-
-    @SneakyThrows
-    public static Trade getTradeOf(Trader trader) {
-        Trade[] possibleTrades =  trades.stream()
-                .filter(t -> t.getCouple().has(trader))
-                .toArray(Trade[]::new);
-        if(possibleTrades.length > 1) throw new MultiTradeException(trader, possibleTrades);
-        return possibleTrades.length == 0 ? null : possibleTrades[0];
     }
 
     public boolean isTradeAccepted() {
@@ -124,35 +117,32 @@ public class Trade {
 
     private void confirmTrade() {
 
-        class Interrupt {
-            @Getter
-            private String reason;
-            @Getter
-            private boolean interrupted = false;
-
-            public void setReason(String reason) {
-                interrupted = true;
-                this.reason = reason;
-            }
-
-            public void send(Player player) {
-                player.sendMessage("\u00a7c" + reason);
-            }
-        }
-
-        cancelled = true;
-        Interrupt interrupt = new Interrupt();
         Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
+        cancelled = true;
+        boolean interrupted = false;
+        Consumer<Trader> interrupt = (t) -> {
+            Player player = t.getPlayer();
+            player.sendMessage("\u00a7cTrade was unable to be completed.");
+
+            List<ItemStack> offeredItems = t.getOfferedItems();
+
+            for(ItemStack item : offeredItems) {
+                if(player.getInventory().firstEmpty() != -1) player.getInventory().addItem(item);
+                else {
+                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                }
+            }
+
+        };
         couple.both(t -> {
-            if(interrupt.isInterrupted()) {
-                interrupt.send(t.getPlayer());
+            if(interrupted) {
+                interrupt.accept(t);
                 return;
             }
             Trader partner = couple.other(t);
-            t.getPlayer().closeInventory();
             if(!t.hasCoins(t.getOfferedCoins())) {
-                interrupt.setReason("Not enough coins.");
-                interrupt.send(t.getPlayer());
+                Trade.this.cancel(t);
+                t.getPlayer().closeInventory();
                 return;
             }
 
@@ -179,7 +169,9 @@ public class Trade {
             t.setTrade(null);
             t.remove();
         });
+        couple.both(t -> t.getPlayer().closeInventory());
         trades.removeIf(t -> t.getCouple().equals(couple));
+        for(int i = 0; i < 10; i++) TradeLogger.getLogger().log(TradeLog.createLog(this));
     }
 
 }

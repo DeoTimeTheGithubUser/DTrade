@@ -9,9 +9,18 @@ public interface Couple<T> {
     T getFirst();
     T getSecond();
 
-    boolean has(T t);
-    void both(Consumer<T> action);
-    T other(T t);
+    default boolean has(T t) {
+        return getFirst().equals(t) || getSecond().equals(t);
+    }
+
+    default void both(Consumer<T> action) {
+        action.accept(getFirst());
+        action.accept(getSecond());
+    }
+
+    default T other(T t) {
+        return t.equals(getFirst()) ? getSecond() : getFirst();
+    };
 
     default boolean oneMeets(Predicate<T> pred) {
         return pred.test(getFirst()) || pred.test(getSecond());
@@ -19,5 +28,19 @@ public interface Couple<T> {
 
     default boolean bothMeet(Predicate<T> pred) {
         return pred.test(getFirst()) && pred.test(getSecond());
+    }
+
+    static <T> Couple<T> of(T first, T second) {
+        return new Couple<>() {
+            @Override
+            public T getFirst() {
+                return first;
+            }
+
+            @Override
+            public T getSecond() {
+                return second;
+            }
+        };
     }
 }
