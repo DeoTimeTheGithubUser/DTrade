@@ -171,7 +171,7 @@ public class Trade {
         });
         couple.both(t -> t.getPlayer().closeInventory());
         trades.removeIf(t -> t.getCouple().equals(couple));
-        for(int i = 0; i < 10; i++) TradeLogger.getLogger().log(TradeLog.createLog(this));
+        TradeLogger.getLogger().log(TradeLog.createLog(this));
     }
 
 }
