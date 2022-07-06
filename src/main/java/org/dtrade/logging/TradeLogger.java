@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.minecraft.gametest.framework.GameTest;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.dtrade.DTrade;
+import org.dtrade.api.events.TradeLogAddedEvent;
 import org.dtrade.util.Couple;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +39,11 @@ public class TradeLogger {
     }
 
     public void log(TradeLog log) {
+
+        TradeLogAddedEvent logAddedEvent = new TradeLogAddedEvent(log);
+        Bukkit.getPluginManager().callEvent(logAddedEvent);
+        if(logAddedEvent.isCancelled()) return;
+
         this.logs.add(log);
         save();
     }

@@ -6,13 +6,16 @@ import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 @UtilityClass
 public final class ItemUtils {
@@ -65,6 +68,20 @@ public final class ItemUtils {
 
     public static ItemStack createGui(Material material, String name) {
         return setDisplayName(new ItemStack(material), name);
+    }
+
+    public static void addToInventoryOrDrop(Player player, ItemStack[] items) {
+        addToInventoryOrDrop(player, items, null);
+    }
+
+    public static void addToInventoryOrDrop(Player player, ItemStack[] items, Consumer<ItemStack> onDrop) {
+        for(ItemStack item : items) {
+            if(player.getInventory().firstEmpty() != -1) player.getInventory().addItem(item);
+            else {
+                player.getWorld().dropItemNaturally(player.getLocation(), item);
+                if(onDrop != null) onDrop.accept(item);
+            }
+        }
     }
 
 }

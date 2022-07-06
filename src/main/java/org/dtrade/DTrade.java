@@ -2,7 +2,6 @@ package org.dtrade;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.dtrade.commands.CommandTrade;
@@ -11,11 +10,9 @@ import org.dtrade.gui.management.GuiManager;
 import org.dtrade.logging.TradeLogger;
 import org.dtrade.packets.PacketHandler;
 import org.dtrade.packets.TradeView;
-import org.dtrade.util.Utils;
 
 import java.io.File;
-import java.sql.PreparedStatement;
-import java.util.logging.Logger;
+import java.util.Comparator;
 
 // TODO multi-version support
 // TODO config options

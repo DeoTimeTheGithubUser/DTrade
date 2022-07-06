@@ -12,9 +12,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.dtrade.EconomyHandler;
+import org.dtrade.api.events.TradeCancelEvent;
+import org.dtrade.api.events.TradeCompleteEvent;
 import org.dtrade.gui.guis.GuiTrade;
 import org.dtrade.logging.TradeLog;
 import org.dtrade.logging.TradeLogger;
+import org.dtrade.util.ItemUtils;
 import org.dtrade.util.TradeUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,19 +44,16 @@ public class Trade {
     }
 
     public void cancel(@NotNull Trader canceller) {
+        TradeCancelEvent cancelEvent = new TradeCancelEvent(this, canceller);
+        Bukkit.getPluginManager().callEvent(cancelEvent);
         cancelled = true;
         trades.removeIf(t -> t.getCouple().equals(couple));
         couple.both(t -> {
             Player player = t.getPlayer();
             List<ItemStack> offeredItems = t.getOfferedItems();
 
-            for(ItemStack item : offeredItems) {
-                if(player.getInventory().firstEmpty() != -1) player.getInventory().addItem(item);
-                else {
-                    player.getWorld().dropItemNaturally(player.getLocation(), item);
-                    player.sendMessage("\u00a7cYour inventory was full so an item was dropped.");
-                }
-            }
+            ItemUtils.addToInventoryOrDrop(player, offeredItems.toArray(ItemStack[]::new),
+                    (i) -> player.sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
 
             t.remove();
             t.getPlayer().sendMessage(t.equals(canceller) ? "\u00a7cYou cancelled the trade." : "\u00a7c" + canceller.getPlayer().getName() + " cancelled the trade.");
@@ -117,28 +117,18 @@ public class Trade {
 
     private void confirmTrade() {
 
+        TradeCompleteEvent completeEvent = new TradeCompleteEvent(this);
+        Bukkit.getPluginManager().callEvent(completeEvent);
+        if(completeEvent.isCancelled()) {
+            this.secondsUntilAccept = -1;
+            couple.both(t -> t.setAcceptedTrade(false));
+            return;
+        }
+
         Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
         cancelled = true;
-        boolean interrupted = false;
-        Consumer<Trader> interrupt = (t) -> {
-            Player player = t.getPlayer();
-            player.sendMessage("\u00a7cTrade was unable to be completed.");
 
-            List<ItemStack> offeredItems = t.getOfferedItems();
-
-            for(ItemStack item : offeredItems) {
-                if(player.getInventory().firstEmpty() != -1) player.getInventory().addItem(item);
-                else {
-                    player.getWorld().dropItemNaturally(player.getLocation(), item);
-                }
-            }
-
-        };
         couple.both(t -> {
-            if(interrupted) {
-                interrupt.accept(t);
-                return;
-            }
             Trader partner = couple.other(t);
             if(!t.hasCoins(t.getOfferedCoins())) {
                 Trade.this.cancel(t);
@@ -163,7 +153,9 @@ public class Trade {
 
             t.getPlayer().spigot().sendMessage(complete, tComponent, new TextComponent("\u00a78 | "), rComponent);
 
-            partner.getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
+            ItemUtils.addToInventoryOrDrop(partner.getPlayer(), t.getOfferedItems().toArray(ItemStack[]::new),
+                    (i) -> partner.getPlayer().sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
+//            partner.getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
             eco.depositPlayer(t.getPlayer(), receivedCoins);
             eco.withdrawPlayer(t.getPlayer(), offeredCoins);
             t.setTrade(null);

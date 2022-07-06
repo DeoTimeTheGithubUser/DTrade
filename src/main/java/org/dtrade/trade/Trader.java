@@ -40,8 +40,8 @@ public class Trader {
         offeredItems.add(itemStack);
     }
 
-    public void removeTradeItem(ItemStack itemStack) {
-        offeredItems.remove(itemStack);
+    public void removeTradeItem(int index) {
+        offeredItems.remove(index);
     }
 
     public boolean hasCoins(double amount) {

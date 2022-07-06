@@ -4,7 +4,6 @@ import lombok.experimental.ExtensionMethod;
 import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
-import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.world.inventory.Containers;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
@@ -12,16 +11,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.dtrade.api.events.TradeAddItemEvent;
+import org.dtrade.api.events.TradeChangeCoinsEvent;
+import org.dtrade.api.events.TradeRemoveItemEvent;
+import org.dtrade.api.events.TradeRequestEvent;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.packets.SignInput;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.Trader;
 import org.dtrade.util.ItemUtils;
 import org.dtrade.util.TradeUtils;
-
-import java.util.Arrays;
 
 @ExtensionMethod({ItemUtils.class})
 public class GuiTrade extends Gui {
@@ -73,7 +73,12 @@ public class GuiTrade extends Gui {
 
                 if(valid) {
                     if(!trader.hasCoins(amount)) trader.getPlayer().sendMessage("\u00a7cYou do not have enough coins!");
-                    else trader.setOfferedCoins(amount);
+                    else {
+                        TradeChangeCoinsEvent coinEvent = new TradeChangeCoinsEvent(trader, amount);
+                        Bukkit.getPluginManager().callEvent(coinEvent);
+                        if(coinEvent.isCancelled()) return;
+                        trader.setOfferedCoins(coinEvent.getAmount());
+                    }
                 }
                 else trader.getPlayer().sendMessage("\u00a7cInvalid coin input!");
 
@@ -83,9 +88,14 @@ public class GuiTrade extends Gui {
         if (event.getClickedInventory().equals(trader.getPlayer().getInventory())) {
             ItemStack offeredItem = event.getCurrentItem();
             if(offeredItem == null) return;
+
+            TradeAddItemEvent addItemEvent = new TradeAddItemEvent(trader, offeredItem);
+            Bukkit.getPluginManager().callEvent(addItemEvent);
+            if(addItemEvent.isCancelled()) return;
+
             trade.getCouple().both(t -> t.setAcceptedTrade(false));
             trader.getPlayer().getInventory().setItem(slot, null);
-            trader.addTradeItem(offeredItem);
+            trader.addTradeItem(addItemEvent.getItem());
             trade.getCouple().other(trader).getPlayer().updateInventory();
         } else if (event.getClickedInventory().equals(this)){
             if(TradeUtils.isOtherTraderSlot(event.getSlot()) || TradeUtils.isMiddle(event.getSlot())) return;
@@ -93,8 +103,14 @@ public class GuiTrade extends Gui {
             int converted = TradeUtils.convertSlotToTradeIndex(slot);
             trade.getCouple().both(t -> t.setAcceptedTrade(false));
             ItemStack removedItem = trader.getOfferedItems().get(converted);
-            trader.removeTradeItem(removedItem);
-            trader.getPlayer().getInventory().addItem(removedItem.clone());
+            if(removedItem == null) return;
+
+            TradeRemoveItemEvent removeItemEvent = new TradeRemoveItemEvent(trader, removedItem);
+            Bukkit.getPluginManager().callEvent(removeItemEvent);
+            if(removeItemEvent.isCancelled()) return;
+
+            trader.removeTradeItem(converted);
+            trader.getPlayer().getInventory().addItem(removeItemEvent.getItem().clone());
             trade.getCouple().other(trader).getPlayer().updateInventory();
         }
     }

@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.dtrade.DTrade;
+import org.dtrade.api.events.TradeRequestEvent;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.TradeCouple;
 import org.dtrade.trade.Trader;
@@ -59,15 +60,15 @@ public class CommandTrade implements CommandExecutor {
         }
 
         if (requests.containsKey(requested.getUniqueId())) {
-
             Trade trade = Trade.createTrade(plugin, TradeCouple.of(Trader.createTrader(player), Trader.createTrader(requested)));
-
             trade.initializeTrade();
             requests.remove(requested.getUniqueId());
-
             return true;
         }
 
+        TradeRequestEvent requestEvent = new TradeRequestEvent(player, requested);
+        Bukkit.getPluginManager().callEvent(requestEvent);
+        if(requestEvent.isCancelled()) return true;
         requests.put(player.getUniqueId(), requested.getUniqueId());
         player.sendMessage("\u00a7aYou sent a trade request to " + args[0] + ".");
 
