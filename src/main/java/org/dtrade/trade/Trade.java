@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.dtrade.EconomyHandler;
 import org.dtrade.api.events.TradeCancelEvent;
 import org.dtrade.api.events.TradeCompleteEvent;
+import org.dtrade.config.DTradeConfig;
 import org.dtrade.gui.guis.GuiTrade;
 import org.dtrade.logging.TradeLog;
 import org.dtrade.logging.TradeLogger;
@@ -82,7 +83,7 @@ public class Trade {
     public void updateTradeAccepted() {
         if (!isTradeAccepted()) return;
 
-        secondsUntilAccept = 5;
+        secondsUntilAccept = DTradeConfig.getConfig().getSecondsUntilAccept();
 
         new BukkitRunnable() {
 

@@ -4,6 +4,7 @@ package org.dtrade.util;
 import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.ChatColor;
 
 @UtilityClass
 public final class ChatUtils {
