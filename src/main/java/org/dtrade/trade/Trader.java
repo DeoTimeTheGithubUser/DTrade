@@ -7,10 +7,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.EconomyHandler;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor @Data
 public class Trader {
@@ -48,6 +46,10 @@ public class Trader {
         Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
         double bal = eco.getBalance(getPlayer());
         return bal >= amount;
+    }
+
+    public Trader getPartner() {
+        return trade.getCouple().other(this);
     }
 
     public static Trader createTrader(Player player) {

@@ -32,47 +32,29 @@ public class TradeView {
             public void onWrite(Player player, PacketPlayOutSetSlot packet) {
                 Trader trader = Trader.getTrader(player);
                 if(trader == null) return;
+                Trader partner = trader.getPartner();
                 Trade trade = trader.getTrade();
                 if(trade == null || trade.isCancelled()) return;
-
                 boolean econEnabled = EconomyHandler.getEconomyHandler().supportsEconomy();
-
                 int slot = (int) ReflectUtils.getField(packet, "e");
-//                Field slotField = PacketPlayOutSetSlot.class.getDeclaredField("e");
-//                slotField.setAccessible(true);
-//                int slot = (int) slotField.get(packet);
-
                 int c = (int) ReflectUtils.getField(packet, "c");
-
-//                Field cField = PacketPlayOutSetSlot.class.getDeclaredField("c");
-//                cField.setAccessible(true);
-//                int c = (int) cField.get(packet);
-
                 if (c == 0 || slot > 53) return;
-
                 if (TradeUtils.isMiddle(slot)) {
                     if(slot == 40 && econEnabled) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                     else if(slot == 49) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
                     else if (slot % 9 == 4) ReflectUtils.setField(packet, "f", CraftItemStack.asNMSCopy(ItemUtils.createMenuGlass()));
                     return;
                 }
-
-
-
                 ItemStack slotDisplayItem = new ItemStack(Material.AIR);
-
                 int convertedSlot = TradeUtils.convertOtherSlotToTradeIndex(slot);
                 if(convertedSlot < 0) {
                     return;
                 }
-
                 if (!TradeUtils.isOtherTraderSlot(slot) && trader.getOfferedItems().size() > convertedSlot)
                     slotDisplayItem = trader.getOfferedItems().get(convertedSlot);
-                else if (trade.getCouple().other(trader).getOfferedItems().size() > convertedSlot)
-                    slotDisplayItem = trade.getCouple().other(trader).getOfferedItems().get(convertedSlot);
-
+                else if (partner.getOfferedItems().size() > convertedSlot)
+                    slotDisplayItem = partner.getOfferedItems().get(convertedSlot);
                 net.minecraft.world.item.ItemStack display = CraftItemStack.asNMSCopy(slotDisplayItem);
-
                 ReflectUtils.setField(packet, "f", display);
             }
         };
@@ -86,30 +68,25 @@ public class TradeView {
             public void onWrite(Player player, PacketPlayOutWindowItems packet) {
                 Trader trader = Trader.getTrader(player);
                 if (trader == null) return;
+                Trader partner = trader.getPartner();
                 Trade trade = trader.getTrade();
                 if (trade == null || trade.isCancelled()) return;
                 boolean econEnabled = EconomyHandler.getEconomyHandler().supportsEconomy();
                 List<net.minecraft.world.item.ItemStack> items = (List<net.minecraft.world.item.ItemStack>)
                         ReflectUtils.getField(packet, "c");
-
                 for (int i = 0; i < items.size(); i++) {
-
                     ItemStack slotDisplayItem = CraftItemStack.asBukkitCopy(items.get(i));
-
-                    if (!TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isMiddle(i)) {
+                    if (!TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isMiddle(i))
                         if (trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(i))
                             slotDisplayItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(i));
-                    } else if (!TradeUtils.isMiddle(i)) {
-                        if (trade.getCouple().other(trader).getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(i))
-                            slotDisplayItem = trade.getCouple().other(trader).getOfferedItems().get(TradeUtils.convertOtherSlotToTradeIndex(i));
-                    }
+                    else if (!TradeUtils.isMiddle(i))
+                        if (partner.getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(i))
+                            slotDisplayItem = partner.getOfferedItems().get(TradeUtils.convertOtherSlotToTradeIndex(i));
 
                     net.minecraft.world.item.ItemStack display = CraftItemStack.asNMSCopy(slotDisplayItem);
-
                     items.set(i, display);
                 }
-                for (int i = 0; i < GuiTrade.SIZE; i++)
-                    if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(ItemUtils.createMenuGlass()));
+                for (int i = 0; i < GuiTrade.SIZE; i++) if (i % 9 == 4) items.set(i, CraftItemStack.asNMSCopy(ItemUtils.createMenuGlass()));
                 if (econEnabled) items.set(40, CraftItemStack.asNMSCopy(createMoneyButton(trade, trader)));
                 items.set(49, CraftItemStack.asNMSCopy(createAcceptButton(trade, trader)));
                 ReflectUtils.setField(packet, "c", items);
@@ -118,7 +95,7 @@ public class TradeView {
     }
 
     private static ItemStack createAcceptButton(Trade trade, Trader trader) {
-        Trader otherTrader = trade.getCouple().other(trader);
+        Trader otherTrader = trader.getPartner();
         ItemStack acceptTradeButton = new ItemStack(Material.AIR);
         acceptTradeButton.setType(trade.getCouple().oneMeets(Trader::isAcceptedTrade) ? Material.GREEN_WOOL : Material.RED_WOOL);
 
@@ -138,7 +115,7 @@ public class TradeView {
     }
 
     private static ItemStack createMoneyButton(Trade trade, Trader trader) {
-        Trader otherTrader = trade.getCouple().other(trader);
+        Trader otherTrader = trader.getPartner();
         ItemStack moneyButton = new ItemStack(Material.GOLD_INGOT);
         moneyButton
                 .setDisplayName("\u00a7aMoney Offered")

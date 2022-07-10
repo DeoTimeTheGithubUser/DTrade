@@ -2,7 +2,6 @@ package org.dtrade.trade;
 
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.function.Function;
 
 public class MultiTradeException extends Exception{
     public MultiTradeException(Trader trader, Trade... trades) {

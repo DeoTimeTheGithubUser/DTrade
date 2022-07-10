@@ -81,7 +81,7 @@ public class SignInput {
         ((CraftPlayer) player).getHandle().b.a(sign.c());
         ((CraftPlayer) player).getHandle().b.a(signPacket);
         PacketHandler.getPacketHandler().subscribe(PacketPlayInUpdateSign.class, (PacketHandler.PacketReadSubscriber<PacketPlayInUpdateSign>) (player, packet) -> {
-            if(valid) cb.complete(packet.c());
+            if(valid) Bukkit.getScheduler().runTask(plugin, () -> cb.complete(packet.c()));
             valid = false;
         });
     }

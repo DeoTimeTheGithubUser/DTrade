@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.dtrade.api.events.TradeAddItemEvent;
 import org.dtrade.api.events.TradeChangeCoinsEvent;
 import org.dtrade.api.events.TradeRemoveItemEvent;
-import org.dtrade.api.events.TradeRequestEvent;
+import org.dtrade.config.DTradeConfig;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.packets.SignInput;
 import org.dtrade.trade.Trade;
@@ -28,15 +28,13 @@ public class GuiTrade extends Gui {
 
     private final Trade trade;
     private final Trader trader;
-    private final Trader otherTrader;
 
     public static final int SIZE = 54;
 
     public GuiTrade(Trader trader) {
-        super("Trading with " + trader.getTrade().getCouple().other(trader).getPlayer().getName(), SIZE);
+        super(DTradeConfig.color(DTradeConfig.getTradeGuiTitle().replaceAll("%player%", trader.getPartner().getPlayer().getName())), SIZE);
         this.trade = trader.getTrade();
         this.trader = trader;
-        this.otherTrader = trade.getCouple().other(trader);
     }
 
     @Override
@@ -51,7 +49,8 @@ public class GuiTrade extends Gui {
         }
         if(slot == 40) {
             trade.getCouple().both(t -> t.setAcceptedTrade(false));
-            SignInput.requestSignInput(trade.getPlugin(), trader.getPlayer(), new String[]{"", "^^^^^^^^^^^^^^", "Enter coins to", "offer in trade."}).thenAccept(lines -> {
+            String[] prompt = DTradeConfig.colorArr(DTradeConfig.getPrompt());
+            SignInput.requestSignInput(trade.getPlugin(), trader.getPlayer(), prompt).thenAccept(lines -> {
                 String input = lines[0];
                 boolean valid;
                 Long amount = null;
@@ -69,10 +68,10 @@ public class GuiTrade extends Gui {
                 PacketPlayOutOpenWindow packet = new PacketPlayOutOpenWindow(windowID, type, title);
 
                 ((CraftPlayer) trader.getPlayer()).getHandle().b.a(packet);
-                trader.getTrade().getCouple().both(t -> Bukkit.getScheduler().scheduleSyncDelayedTask(trade.getPlugin(), () -> t.getPlayer().updateInventory(), 1L));
+                trader.getTrade().getCouple().both(t -> Bukkit.getScheduler().runTask(trade.getPlugin(), () -> t.getPlayer().updateInventory()));
 
                 if(valid) {
-                    if(!trader.hasCoins(amount)) trader.getPlayer().sendMessage("\u00a7cYou do not have enough coins!");
+                    if(!trader.hasCoins(amount)) trader.getPlayer().sendMessage(DTradeConfig.prefix(DTradeConfig.getNotEnoughCoins()));
                     else {
                         TradeChangeCoinsEvent coinEvent = new TradeChangeCoinsEvent(trader, amount);
                         Bukkit.getPluginManager().callEvent(coinEvent);
@@ -80,7 +79,7 @@ public class GuiTrade extends Gui {
                         trader.setOfferedCoins(coinEvent.getAmount());
                     }
                 }
-                else trader.getPlayer().sendMessage("\u00a7cInvalid coin input!");
+                else trader.getPlayer().sendMessage(DTradeConfig.prefix(DTradeConfig.getInvalidCoins()));
 
             });
             return;
@@ -96,7 +95,7 @@ public class GuiTrade extends Gui {
             trade.getCouple().both(t -> t.setAcceptedTrade(false));
             trader.getPlayer().getInventory().setItem(slot, null);
             trader.addTradeItem(addItemEvent.getItem());
-            trade.getCouple().other(trader).getPlayer().updateInventory();
+            trader.getPartner().getPlayer().updateInventory();
         } else if (event.getClickedInventory().equals(this)){
             if(TradeUtils.isOtherTraderSlot(event.getSlot()) || TradeUtils.isMiddle(event.getSlot())) return;
             if(trader.getOfferedItems().isEmpty() || trader.getOfferedItems().size() <= TradeUtils.convertSlotToTradeIndex(slot)) return;
@@ -111,7 +110,7 @@ public class GuiTrade extends Gui {
 
             trader.removeTradeItem(converted);
             trader.getPlayer().getInventory().addItem(removeItemEvent.getItem().clone());
-            trade.getCouple().other(trader).getPlayer().updateInventory();
+            trader.getPartner().getPlayer().updateInventory();
         }
     }
 

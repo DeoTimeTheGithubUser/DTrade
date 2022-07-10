@@ -1,6 +1,5 @@
 package org.dtrade.gui.management;
 
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryCustom;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;

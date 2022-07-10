@@ -7,7 +7,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
-import org.dtrade.DTrade;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;

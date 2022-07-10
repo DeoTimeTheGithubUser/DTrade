@@ -1,6 +1,6 @@
 package org.dtrade.trade;
 
-import lombok.*;
+import lombok.Data;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -22,8 +22,10 @@ import org.dtrade.util.ItemUtils;
 import org.dtrade.util.TradeUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Data
 public class Trade {
@@ -38,6 +40,7 @@ public class Trade {
     private boolean cancelled;
 
     private int secondsUntilAccept = -1;
+    private BukkitRunnable timer;
 
     public Trade(Plugin plugin, TradeCouple couple) {
         this.plugin = plugin;
@@ -57,7 +60,8 @@ public class Trade {
                     (i) -> player.sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
 
             t.remove();
-            t.getPlayer().sendMessage(t.equals(canceller) ? "\u00a7cYou cancelled the trade." : "\u00a7c" + canceller.getPlayer().getName() + " cancelled the trade.");
+            String cancelMsg = t.equals(canceller) ? DTradeConfig.prefix(DTradeConfig.getCancelledTrade()) : DTradeConfig.prefix(DTradeConfig.getOtherCancelledTrade());
+            t.getPlayer().sendMessage(cancelMsg);
             if (!t.equals(canceller)) t.getPlayer().closeInventory();
         });
     }
@@ -83,9 +87,10 @@ public class Trade {
     public void updateTradeAccepted() {
         if (!isTradeAccepted()) return;
 
-        secondsUntilAccept = DTradeConfig.getConfig().getSecondsUntilAccept();
+        secondsUntilAccept = DTradeConfig.getSecondsUntilAccept();
 
-        new BukkitRunnable() {
+        if(timer != null) timer.cancel();
+        timer = new BukkitRunnable() {
 
             @Override
             public void run() {
@@ -112,7 +117,8 @@ public class Trade {
 
             }
 
-        }.runTaskTimer(plugin, 0L, 20L);
+        };
+        timer.runTaskTimer(plugin, 0L, 20L);
 
     }
 
@@ -130,7 +136,7 @@ public class Trade {
         cancelled = true;
 
         couple.both(t -> {
-            Trader partner = couple.other(t);
+            Trader partner = t.getPartner();
             if(!t.hasCoins(t.getOfferedCoins())) {
                 Trade.this.cancel(t);
                 t.getPlayer().closeInventory();
@@ -156,7 +162,6 @@ public class Trade {
 
             ItemUtils.addToInventoryOrDrop(partner.getPlayer(), t.getOfferedItems().toArray(ItemStack[]::new),
                     (i) -> partner.getPlayer().sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
-//            partner.getPlayer().getInventory().addItem(t.getOfferedItems().toArray(ItemStack[]::new));
             eco.depositPlayer(t.getPlayer(), receivedCoins);
             eco.withdrawPlayer(t.getPlayer(), offeredCoins);
             t.setTrade(null);

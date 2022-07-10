@@ -1,7 +1,6 @@
 package org.dtrade.util;
 
 import lombok.SneakyThrows;
-import net.minecraft.world.inventory.Container;
 
 import java.lang.reflect.Field;
 

@@ -7,16 +7,15 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public interface Config {
 
     @SneakyThrows
-    default void load(Plugin plugin) {
+    static void load(Plugin plugin, Class<? extends Config> config) {
 
-        ConfigMeta meta = getConfigMeta(this);
+        ConfigMeta meta = getConfigMeta(config);
         File file = new File(plugin.getDataFolder(), meta.fileName());
-        Field[] configs = this.getClass().getDeclaredFields();
+        Field[] configs = config.getDeclaredFields();
 
         boolean firstCreation = !file.exists();
         if(firstCreation) {
@@ -24,19 +23,18 @@ public interface Config {
             file.createNewFile();
         }
 
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(file);
         for(Field field : configs) {
             field.setAccessible(true);
             ConfigPath path = getConfigPath(field);
             if(path == null) continue;
-            if(firstCreation || config.get(path.path()) == null) config.set(path.path(), field.get(this));
-            else field.set(this, config.get(path.path()));
+            if(firstCreation || fileConfig.get(path.path()) == null) fileConfig.set(path.path(), field.get(null));
+            else field.set(null, fileConfig.get(path.path()));
         }
-        config.save(file);
+        fileConfig.save(file);
     }
 
-    private static ConfigMeta getConfigMeta(Config config) {
-        Class<?> clazz = config.getClass();
+    private static ConfigMeta getConfigMeta(Class<? extends Config> clazz) {
         return clazz.getAnnotation(ConfigMeta.class);
     }
 

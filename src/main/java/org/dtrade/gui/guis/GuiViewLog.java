@@ -7,12 +7,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.logging.TradeLog;
-import org.dtrade.packets.TradeView;
 import org.dtrade.util.Couple;
 import org.dtrade.util.ItemUtils;
 import org.dtrade.util.TradeUtils;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @ExtensionMethod({ItemUtils.class})
 public class GuiViewLog extends Gui {

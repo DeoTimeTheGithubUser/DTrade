@@ -6,6 +6,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.dtrade.commands.CommandTrade;
 import org.dtrade.commands.CommandTradeLog;
+import org.dtrade.config.Config;
 import org.dtrade.config.DTradeConfig;
 import org.dtrade.gui.management.GuiManager;
 import org.dtrade.logging.TradeLogger;
@@ -13,10 +14,8 @@ import org.dtrade.packets.PacketHandler;
 import org.dtrade.packets.TradeView;
 
 import java.io.File;
-import java.util.Comparator;
 
 // TODO multi-version support
-// TODO config options
 
 public class DTrade extends JavaPlugin {
 
@@ -29,7 +28,7 @@ public class DTrade extends JavaPlugin {
 
         loggerFile = new File(this.getDataFolder(), "logs.json");
 
-        DTradeConfig.init(this);
+        Config.load(this, DTradeConfig.class);
         PacketHandler.init(this);
         Bukkit.getOnlinePlayers().forEach(PacketHandler.getPacketHandler()::registerPlayer);
         EconomyHandler.init(this);

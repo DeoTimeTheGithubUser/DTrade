@@ -1,27 +1,21 @@
 package org.dtrade.commands;
 
-import com.sun.jna.platform.win32.WinNT;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.dtrade.DTrade;
 import org.dtrade.api.events.TradeRequestEvent;
+import org.dtrade.config.DTradeConfig;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.TradeCouple;
 import org.dtrade.trade.Trader;
 import org.dtrade.util.ChatUtils;
-import org.dtrade.util.ItemUtils;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -37,7 +31,6 @@ public class CommandTrade implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             sender.sendMessage("\u00a7cPlease enter a username to trade.");
-            sender.sendMessage(ItemUtils.getRealName(((Player)sender).getItemInHand()));
             return true;
         }
 
@@ -50,7 +43,7 @@ public class CommandTrade implements CommandExecutor {
         }
 
         if (player.getUniqueId().equals(requested.getUniqueId())) {
-            sender.sendMessage("\u00a7cYou cannot trade yourself.");
+            sender.sendMessage(DTradeConfig.prefix(DTradeConfig.getCantTradeSelf()));
             return true;
         }
 

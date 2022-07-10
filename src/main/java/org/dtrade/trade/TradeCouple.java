@@ -1,10 +1,7 @@
 package org.dtrade.trade;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.dtrade.util.Couple;
-
-import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class TradeCouple implements Couple<Trader> {
