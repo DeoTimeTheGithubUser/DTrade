@@ -2,12 +2,15 @@ package org.dtrade.util;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,15 +70,14 @@ public final class ItemUtils {
         return setDisplayName(new ItemStack(material), name);
     }
 
-    public static void addToInventoryOrDrop(Player player, ItemStack[] items) {
-        addToInventoryOrDrop(player, items, null);
-    }
-
-    public static void addToInventoryOrDrop(Player player, ItemStack[] items, Consumer<ItemStack> onDrop) {
+    public static void addToInventoryOrDrop(Plugin plugin, Player player, ItemStack[] items, Consumer<ItemStack> onDrop) {
         for(ItemStack item : items) {
             if(player.getInventory().firstEmpty() != -1) player.getInventory().addItem(item);
             else {
-                player.getWorld().dropItemNaturally(player.getLocation(), item);
+                player.getWorld().dropItemNaturally(player.getLocation(), item, (i) -> {
+                    i.setOwner(player.getUniqueId());
+                    for(Player p : Bukkit.getOnlinePlayers()) if(!p.equals(player)) p.hideEntity(plugin, i);
+                });
                 if(onDrop != null) onDrop.accept(item);
             }
         }

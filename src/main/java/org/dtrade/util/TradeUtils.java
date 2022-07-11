@@ -2,7 +2,13 @@ package org.dtrade.util;
 
 import lombok.experimental.ExtensionMethod;
 import lombok.experimental.UtilityClass;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.inventory.ItemStack;
+import org.dtrade.config.DTradeConfig;
 import org.dtrade.trade.Trader;
 
 import java.util.ArrayList;
@@ -36,7 +42,23 @@ public final class TradeUtils {
         return slot % 9 > 4;
     }
 
-    public static String getTradeReceipt(Trader trader, boolean received) {
+    public static BaseComponent[] getTradeReceipt(Trader trader) {
+        ComponentBuilder builder = new ComponentBuilder();
+        TextComponent message = new TextComponent(DTradeConfig.prefix(DTradeConfig.getTradeComplete(), trader.getPlayer()));
+        TextComponent tradedReceipt = new TextComponent(DTradeConfig.color(DTradeConfig.getReceiptTraded()));
+        TextComponent receivedReceipt = new TextComponent(DTradeConfig.color(DTradeConfig.getReceiptReceived()));
+        tradedReceipt.setHoverEvent(getTradeReceiptTooltip(trader, false));
+        receivedReceipt.setHoverEvent(getTradeReceiptTooltip(trader, true));
+        builder
+                .append(message)
+                .append("\n")
+                .append(tradedReceipt)
+                .append(receivedReceipt);
+        return builder.create();
+
+    }
+
+    public static HoverEvent getTradeReceiptTooltip(Trader trader, boolean received) {
         Trader target = received ? trader.getPartner() : trader;
         List<String> lines = new ArrayList<>();
         lines.add("\u00a7aCoins: \u00a7e" + target.getOfferedCoins());
@@ -46,7 +68,7 @@ public final class TradeUtils {
         if (target.getOfferedItems().size() == 0) lines.add("\u00a78none");
         String combined = "";
         for (String s : lines) combined += s + "\n";
-        return combined.substring(0, combined.length() - 1);
+        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(combined.substring(0, combined.length() - 1)));
     }
 
 }

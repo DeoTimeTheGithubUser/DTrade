@@ -1,7 +1,6 @@
 package org.dtrade.trade;
 
 import lombok.Data;
-import lombok.val;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -27,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 public class Trade {
@@ -58,8 +56,8 @@ public class Trade {
             Player player = t.getPlayer();
             List<ItemStack> offeredItems = t.getOfferedItems();
 
-            ItemUtils.addToInventoryOrDrop(player, offeredItems.toArray(ItemStack[]::new),
-                    (i) -> player.sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
+            ItemUtils.addToInventoryOrDrop(plugin, player, offeredItems.toArray(ItemStack[]::new),
+                    (i) -> player.sendMessage(DTradeConfig.prefix(DTradeConfig.getItemDroppedBecauseNoSpace())));
 
             t.remove();
             String cancelMsg = canceller == null ? DTradeConfig.prefix("\u00a7cSomething went wrong with your trade!") : t.equals(canceller) ? DTradeConfig.prefix(DTradeConfig.getCancelledTrade()) : DTradeConfig.prefix(DTradeConfig.getOtherCancelledTrade(), t.getPartner().getPlayer());
@@ -71,7 +69,7 @@ public class Trade {
     public void initializeTrade() {
         couple.both((t) -> {
             t.getPlayer().openInventory(new GuiTrade(t));
-            t.getPlayer().sendMessage("\u00a7aYou are now trading with " + couple.other(t).getPlayer().getName() + ".");
+            t.getPlayer().sendMessage(DTradeConfig.prefix(DTradeConfig.getNowTradingWith(), t.getPartner().getPlayer()));
         });
     }
 
@@ -154,21 +152,10 @@ public class Trade {
             long offeredCoins = t.getOfferedCoins();
 
             t.getPlayer().playSound(t.getPlayer().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100f, 1f);
+            if(DTradeConfig.isReceiptEnabled()) t.getPlayer().spigot().sendMessage(TradeUtils.getTradeReceipt(t));
 
-            TextComponent complete = new TextComponent("\u00a77Completed trade with \u00a7a" + partner.getPlayer().getName() + "\u00a77!\n");
-
-            String tradedReceipt = "\u00a77[\u00a7aTraded Receipt\u00a77]\u00a7a";
-            TextComponent tComponent = new TextComponent(tradedReceipt);
-            tComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTradeReceipt(t, false))));
-
-            String receivedReceipt = "\u00a77[\u00a7aReceived Receipt\u00a77]\u00a7a";
-            TextComponent rComponent = new TextComponent(receivedReceipt);
-            rComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TradeUtils.getTradeReceipt(t, true))));
-
-            t.getPlayer().spigot().sendMessage(complete, tComponent, new TextComponent("\u00a78 | "), rComponent);
-
-            ItemUtils.addToInventoryOrDrop(partner.getPlayer(), t.getOfferedItems().toArray(ItemStack[]::new),
-                    (i) -> partner.getPlayer().sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
+            ItemUtils.addToInventoryOrDrop(plugin, partner.getPlayer(), t.getOfferedItems().toArray(ItemStack[]::new),
+                    (i) -> partner.getPlayer().sendMessage(DTradeConfig.prefix(DTradeConfig.getItemDroppedBecauseNoSpace())));
             eco.depositPlayer(t.getPlayer(), receivedCoins);
             eco.withdrawPlayer(t.getPlayer(), offeredCoins);
             t.setTrade(null);

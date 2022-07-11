@@ -1,10 +1,13 @@
 package org.dtrade.logging;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_18_R2.CraftOfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -29,42 +32,56 @@ public class TradeLog implements Serializable {
     @Getter
     private Date date;
 
-    private UUID trader1;
-    private UUID trader2;
+    @Getter
+    private Couple<OfflinePlayer> traders;
+    @Getter
+    private Couple<ItemStack[]> items;
+    @Getter
+    private Couple<Long> coins;
 
-    private String trader1Items;
-    private String trader2Items;
-
-    private long trader1Coins;
-    private long trader2Coins;
-
-    public TradeLog(Date date, UUID trader1, UUID trader2, ItemStack[] trader1Items, ItemStack[] trader2Items, long trader1Coins, long trader2Coins) {
+    public TradeLog(Date date, Couple<OfflinePlayer> traders, Couple<ItemStack[]> items, Couple<Long> coins) {
         this.date = date;
-        this.trader1 = trader1;
-        this.trader2 = trader2;
-        this.trader1Items = serializeItems(trader1Items);
-        this.trader2Items = serializeItems(trader2Items);
-        this.trader1Coins = trader1Coins;
-        this.trader2Coins = trader2Coins;
+        this.traders = traders;
+        this.items = items;
+        this.coins = coins;
     }
 
     public String serialize() {
-        return new Gson().toJson(this);
+        JsonObject log = new JsonObject();
+
+        log.addProperty("date", date.getTime());
+        traders.both(p -> {
+            JsonObject trader = new JsonObject();
+            int index = traders.indexOf(p);
+            trader.addProperty("uuid", p.getUniqueId().toString());
+            trader.addProperty("items", index == 0? serializeItems(items.getFirst()) : serializeItems(items.getSecond()));
+            trader.addProperty("coins", index == 0 ? coins.getFirst() : coins.getSecond());
+            log.add("trader" + (index + 1), trader);
+        });
+
+        return log.toString();
     }
 
-    public Couple<OfflinePlayer> getPlayers() {
-        return Couple.of(Bukkit.getOfflinePlayer(trader1), Bukkit.getOfflinePlayer(trader2));
-    }
+    public static TradeLog deserialize(JsonObject obj) {
 
-    public Couple<ItemStack[]> getItems() {
-        return Couple.of(
-                deserializeItems(trader1Items),
-                deserializeItems(trader2Items)
+        Date date = Date.from(Instant.ofEpochMilli(obj.get("date").getAsLong()));
+
+        JsonObject trader1 = obj.getAsJsonObject("trader1");
+        JsonObject trader2 = obj.getAsJsonObject("trader2");
+
+        Couple<OfflinePlayer> players = Couple.of(
+                Bukkit.getOfflinePlayer(UUID.fromString(trader1.get("uuid").getAsString())),
+                Bukkit.getOfflinePlayer(UUID.fromString(trader2.get("uuid").getAsString()))
         );
-    }
-
-    public Couple<Long> getOfferedCoins() {
-        return Couple.of(trader1Coins, trader2Coins);
+        Couple<ItemStack[]> items = Couple.of(
+                deserializeItems(trader1.get("items").getAsString()),
+                deserializeItems(trader2.get("items").getAsString())
+        );
+        Couple<Long> coins = Couple.of(
+                trader1.get("coins").getAsLong(),
+                trader2.get("coins").getAsLong()
+        );
+        return new TradeLog(date, players, items, coins);
     }
 
     public static @NotNull TradeLog createLog(@NotNull Trade trade) {
@@ -73,24 +90,14 @@ public class TradeLog implements Serializable {
         Trader trader1 = trade.getCouple().getFirst();
         Trader trader2 = trade.getCouple().getSecond();
 
-        UUID uuid1 = trader1.getPlayer().getUniqueId();
-        UUID uuid2 = trader2.getPlayer().getUniqueId();
-
-        ItemStack[] trader1Items = trader1.getOfferedItems().toArray(ItemStack[]::new);
-        ItemStack[] trader2Items = trader2.getOfferedItems().toArray(ItemStack[]::new);
-
-        long trader1Coins = trade.getCouple().getFirst().getOfferedCoins();
-        long trader2Coins = trade.getCouple().getSecond().getOfferedCoins();
-
-
+        Couple<OfflinePlayer> players = Couple.of(trader1.getPlayer(), trader2.getPlayer());
+        Couple<ItemStack[]> items = Couple.of(trader1.getOfferedItems().toArray(ItemStack[]::new), trader2.getOfferedItems().toArray(ItemStack[]::new));
+        Couple<Long> coins = Couple.of(trader1.getOfferedCoins(), trader2.getOfferedCoins());
         return new TradeLog(
                 date,
-                uuid1,
-                uuid2,
-                trader1Items,
-                trader2Items,
-                trader1Coins,
-                trader2Coins
+                players,
+                items,
+                coins
         );
     }
 

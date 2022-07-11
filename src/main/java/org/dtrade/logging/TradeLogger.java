@@ -1,6 +1,7 @@
 package org.dtrade.logging;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -14,7 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TradeLogger {
     @Getter
@@ -47,7 +50,8 @@ public class TradeLogger {
     @SneakyThrows
     public void save() {
         try(FileWriter writer = new FileWriter(plugin.getLoggerFile())) {
-            String data = new Gson().toJson(logs);
+            Set<String> serializedLogs = logs.stream().map(TradeLog::serialize).collect(Collectors.toSet());
+            String data = new Gson().toJson(serializedLogs);
             writer.write(data);
             writer.flush();
         }
@@ -55,7 +59,7 @@ public class TradeLogger {
 
     public TradeLog[] getTradeLogs(UUID player) {
         return logs.stream().filter(log -> {
-            Couple<OfflinePlayer> players = log.getPlayers();
+            Couple<OfflinePlayer> players = log.getTraders();
             return players.getFirst().getUniqueId().equals(player) || players.getSecond().getUniqueId().equals(player);
         }).sorted(Comparator.comparing(TradeLog::getDate).reversed()).toArray(TradeLog[]::new);
     }
@@ -64,8 +68,12 @@ public class TradeLogger {
     private void loadLogs() {
         File file = plugin.getLoggerFile();
         try(JsonReader reader = new JsonReader(new FileReader(file))) {
-            TradeLog[] loadedLogs = new Gson().fromJson(reader, TradeLog[].class);
-            if(loadedLogs != null) logs.addAll(Arrays.asList(loadedLogs));
+            Set<String> strs = new Gson().fromJson(reader, TypeToken.get(Set.class).getType());
+            if(strs == null) return;
+            Set<JsonElement> objs = strs.stream()
+                    .map(JsonParser::parseString)
+                    .collect(Collectors.toSet());
+            for(JsonElement element : objs) logs.add(TradeLog.deserialize(element.getAsJsonObject()));
         }
     }
 

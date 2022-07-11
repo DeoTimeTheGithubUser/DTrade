@@ -75,7 +75,7 @@ public class GuiTradeLogs extends Gui {
     class TradeLogItem extends ItemStack {
         TradeLogItem(TradeLog log) {
             super(Material.PLAYER_HEAD);
-            Couple<OfflinePlayer> players = log.getPlayers();
+            Couple<OfflinePlayer> players = log.getTraders();
             OfflinePlayer tradedWith = players.getFirst().getUniqueId().equals(target)
                     ? players.getSecond() : players.getFirst();
             SkullMeta meta = (SkullMeta) getItemMeta();

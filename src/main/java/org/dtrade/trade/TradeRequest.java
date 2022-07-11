@@ -19,7 +19,7 @@ public class TradeRequest {
     public static void createTradeRequest(Plugin plugin, Player initializer, Player requested) {
 
         if (requests.containsKey(initializer.getUniqueId())) {
-            initializer.sendMessage("\u00a7cYou already have an outgoing request.");
+            initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getAlreadyOutgoingRequest()));
             return;
         }
 
@@ -34,9 +34,9 @@ public class TradeRequest {
         Bukkit.getPluginManager().callEvent(requestEvent);
         if(requestEvent.isCancelled()) return;
         requests.put(initializer.getUniqueId(), requested.getUniqueId());
-        initializer.sendMessage("\u00a7aYou sent a trade request to " + requested.getName() + ".");
+        initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getSentRequestTo(), requested));
 
-        String sendMessage = "\u00a7aYou received a trade request from " + initializer.getName() + ".";
+        String sendMessage = DTradeConfig.prefix(DTradeConfig.getReceivedRequestFrom(), initializer);
         TextComponent component = ChatUtils.createCommandMessage(sendMessage, "/trade " + initializer.getName());
         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("\u00a7aClick to accept trade!")));
         requested.spigot().sendMessage(component);

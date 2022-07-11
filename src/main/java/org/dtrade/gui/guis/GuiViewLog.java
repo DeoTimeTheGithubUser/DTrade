@@ -25,8 +25,8 @@ public class GuiViewLog extends Gui {
     private void initGuis() {
         for(int i = 0; i < getSize(); i++) if(i % 9 == 4) setItem(i, ItemUtils.createMenuGlass());
         setItem(49, createMoneyItem());
-        log.getPlayers().both(p -> {
-            boolean first = log.getPlayers().getFirst().getUniqueId().equals(p.getUniqueId());
+        log.getTraders().both(p -> {
+            boolean first = log.getTraders().getFirst().getUniqueId().equals(p.getUniqueId());
             ItemStack[] items = first ? log.getItems().getFirst() : log.getItems().getSecond();
             for(int i = 0; i < items.length; i++) {
                 int slot = first ? TradeUtils.convertTradeIndexToSlot(i) : TradeUtils.convertOtherTradeIndexToSlot(i);
@@ -36,8 +36,8 @@ public class GuiViewLog extends Gui {
     }
 
     private ItemStack createMoneyItem() {
-        Couple<OfflinePlayer> players = log.getPlayers();
-        Couple<Long> offered = log.getOfferedCoins();
+        Couple<OfflinePlayer> players = log.getTraders();
+        Couple<Long> offered = log.getCoins();
         ItemStack item = new ItemStack(Material.GOLD_INGOT);
         item
                 .setDisplayName("\u00a7aMoney Offered")
@@ -55,7 +55,7 @@ public class GuiViewLog extends Gui {
     }
 
     private static String formatNames(TradeLog log) {
-        Couple<OfflinePlayer> players = log.getPlayers();
+        Couple<OfflinePlayer> players = log.getTraders();
         return players.getFirst().getName() + "              " + players.getSecond().getName();
     }
 

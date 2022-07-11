@@ -16,16 +16,35 @@ public class DTradeConfig implements Config {
     private static int secondsUntilAccept = 5;
     @ConfigPath("trade.trade_gui_title") @Getter
     private static String tradeGuiTitle = "Trading with %player%";
-
     @ConfigPath("trade.coin_input.prompt") @Getter
     private static String[] prompt = new String[]{"", "^^^^^^^^^^^^^^", "Enter coins to", "offer in trade."};
+    @ConfigPath("trade.trade_receipt.enabled") @Getter
+    private static boolean receiptEnabled = true;
+    @ConfigPath("trade.trade_receipt.traded") @Getter
+    private static String receiptTraded = "&9[Traded Receipt]";
+    @ConfigPath("trade.trade_receipt.received") @Getter
+    private static String receiptReceived = "&e[Received Receipt]";
 
 
     // messages
     @ConfigPath("messages.prefix") @Getter
-    private static String prefix = "&a[&eDTrade&a]";
+    private static String prefix = "&7[&bDTrade&7]";
+    @ConfigPath("messages.now_trading_with") @Getter
+    private static String nowTradingWith = "&aYou are now trading with %player%.";
+    @ConfigPath("messages.sent_request_to") @Getter
+    private static String sentRequestTo = "&aYou sent trade request to %player%.";
+    @ConfigPath("messages.received_request_from") @Getter
+    private static String receivedRequestFrom = "&aYou received a trade request from %player%.";
+    @ConfigPath("messages.trade_complete") @Getter
+    private static String tradeComplete = "&aCompleted trade with %player%!";
+    @ConfigPath("messages.item_dropped_because_no_space") @Getter
+    private static String itemDroppedBecauseNoSpace = "&cAn item was dropped on the ground because you did not have enough space in your inventory!";
 
     // errors
+    @ConfigPath("messages.errors.no_permission") @Getter
+    private static String noPermission = "&cYou do not have permission to perform this action!";
+    @ConfigPath("messages.errors.no_username_entered") @Getter
+    private static String noUsernameEntered = "&cYou need to enter a player's username!";
     @ConfigPath("messages.errors.not_enough_coins") @Getter
     private static String notEnoughCoins = "&cNot enough coins!";
     @ConfigPath("messages.errors.invalid_coins") @Getter

@@ -29,6 +29,10 @@ public interface Couple<T> {
         return pred.test(getFirst()) && pred.test(getSecond());
     }
 
+    default int indexOf(T t) {
+        return !has(t) ? -1 : t.equals(getFirst()) ? 0 : 1;
+    }
+
     static <T> Couple<T> of(T first, T second) {
         return new Couple<>() {
             @Override

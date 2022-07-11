@@ -29,7 +29,7 @@ public class CommandTrade implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("\u00a7cPlease enter a username to trade.");
+            sender.sendMessage(DTradeConfig.prefix(DTradeConfig.getNoUsernameEntered()));
             return true;
         }
         Player player = (Player) sender;
