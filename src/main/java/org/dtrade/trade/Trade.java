@@ -1,6 +1,7 @@
 package org.dtrade.trade;
 
 import lombok.Data;
+import lombok.val;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 public class Trade {
@@ -47,7 +49,7 @@ public class Trade {
         this.couple = couple;
     }
 
-    public void cancel(@NotNull Trader canceller) {
+    public void cancel(Trader canceller) {
         TradeCancelEvent cancelEvent = new TradeCancelEvent(this, canceller);
         Bukkit.getPluginManager().callEvent(cancelEvent);
         cancelled = true;
@@ -60,7 +62,7 @@ public class Trade {
                     (i) -> player.sendMessage("\u00a7cAn item was dropped on the ground because there was not enough space in your inventory!"));
 
             t.remove();
-            String cancelMsg = t.equals(canceller) ? DTradeConfig.prefix(DTradeConfig.getCancelledTrade()) : DTradeConfig.prefix(DTradeConfig.getOtherCancelledTrade());
+            String cancelMsg = canceller == null ? DTradeConfig.prefix("\u00a7cSomething went wrong with your trade!") : t.equals(canceller) ? DTradeConfig.prefix(DTradeConfig.getCancelledTrade()) : DTradeConfig.prefix(DTradeConfig.getOtherCancelledTrade(), t.getPartner().getPlayer());
             t.getPlayer().sendMessage(cancelMsg);
             if (!t.equals(canceller)) t.getPlayer().closeInventory();
         });
@@ -95,6 +97,10 @@ public class Trade {
             @Override
             public void run() {
 
+                if(Trade.this.isCancelled()) {
+                    this.cancel();
+                    return;
+                }
 
                 if (!isTradeAccepted()) {
                     secondsUntilAccept = -1;
@@ -123,6 +129,7 @@ public class Trade {
     }
 
     private void confirmTrade() {
+        Bukkit.broadcastMessage("I AM TRIGGERED! GLITCH");
 
         TradeCompleteEvent completeEvent = new TradeCompleteEvent(this);
         Bukkit.getPluginManager().callEvent(completeEvent);
@@ -133,15 +140,15 @@ public class Trade {
         }
 
         Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
-        cancelled = true;
 
+        if(!couple.bothMeet(t -> t.hasCoins(t.getOfferedCoins()))) {
+            cancel(null);
+            return;
+        }
+
+        cancelled = true;
         couple.both(t -> {
             Trader partner = t.getPartner();
-            if(!t.hasCoins(t.getOfferedCoins())) {
-                Trade.this.cancel(t);
-                t.getPlayer().closeInventory();
-                return;
-            }
 
             long receivedCoins = partner.getOfferedCoins();
             long offeredCoins = t.getOfferedCoins();

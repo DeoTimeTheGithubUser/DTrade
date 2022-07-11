@@ -32,7 +32,7 @@ public class GuiTrade extends Gui {
     public static final int SIZE = 54;
 
     public GuiTrade(Trader trader) {
-        super(DTradeConfig.color(DTradeConfig.getTradeGuiTitle().replaceAll("%player%", trader.getPartner().getPlayer().getName())), SIZE);
+        super(DTradeConfig.color(DTradeConfig.getTradeGuiTitle(), trader.getPartner().getPlayer()), SIZE);
         this.trade = trader.getTrade();
         this.trader = trader;
     }

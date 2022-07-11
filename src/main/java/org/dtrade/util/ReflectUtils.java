@@ -1,10 +1,13 @@
 package org.dtrade.util;
 
 import lombok.SneakyThrows;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.dtrade.api.events.TradeAddItemEvent;
 
 import java.lang.reflect.Field;
 
-public class ReflectUtils {
+public class ReflectUtils implements Listener {
 
     @SneakyThrows
     public static void setField(Object object, String fieldName, Object value) {
@@ -22,7 +25,7 @@ public class ReflectUtils {
             return field.get(object);
         } catch (Exception e) {
             e.printStackTrace();
-            return "HYPER GLITCH";
+            return null;
         }
     }
 

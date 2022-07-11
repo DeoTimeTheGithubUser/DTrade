@@ -1,34 +1,38 @@
 package org.dtrade.config;
 
 import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.util.function.Supplier;
 
 @ConfigMeta(fileName = "config.yml")
 public class DTradeConfig implements Config {
 
-    @ConfigPath(path = "trade.seconds_until_accept") @Getter
+    @ConfigPath("trade.shift_right_click_enabled") @Getter
+    private static boolean shiftRightClickEnabled = true;
+    @ConfigPath("trade.seconds_until_accept") @Getter
     private static int secondsUntilAccept = 5;
-    @ConfigPath(path = "trade.seconds_until_accept") @Getter
+    @ConfigPath("trade.trade_gui_title") @Getter
     private static String tradeGuiTitle = "Trading with %player%";
 
-    @ConfigPath(path = "trade.coin_input.prompt") @Getter
+    @ConfigPath("trade.coin_input.prompt") @Getter
     private static String[] prompt = new String[]{"", "^^^^^^^^^^^^^^", "Enter coins to", "offer in trade."};
 
 
-    @ConfigPath(path = "messages.prefix") @Getter
-    private static String prefix = "&c[DTrade]";
+    @ConfigPath("messages.prefix") @Getter
+    private static String prefix = "&a[&eDTrade&a]";
 
-    @ConfigPath(path = "messages.errors.not_enough_coins") @Getter
+    @ConfigPath("messages.errors.not_enough_coins") @Getter
     private static String notEnoughCoins = "&cNot enough coins!";
-    @ConfigPath(path = "messages.errors.invalid_coins") @Getter
+    @ConfigPath("messages.errors.invalid_coins") @Getter
     private static String invalidCoins = "&cInvalid amount of coins!";
-    @ConfigPath(path = "messages.errors.cancelled_trade") @Getter
+    @ConfigPath("messages.errors.cancelled_trade") @Getter
     private static String cancelledTrade = "&cYou cancelled the trade!";
-    @ConfigPath(path = "messages.errors.other_cancelled_trade") @Getter
+    @ConfigPath("messages.errors.other_cancelled_trade") @Getter
     private static String otherCancelledTrade = "&c%player% cancelled the trade!";
-    @ConfigPath(path = "messages.errors.cant_trade_self") @Getter
+    @ConfigPath("messages.errors.cant_trade_self") @Getter
     private static String cantTradeSelf = "&cYou cannot trade yourself!";
 
     private static <T> T make(Supplier<T> sup) {
@@ -39,9 +43,18 @@ public class DTradeConfig implements Config {
         return color(prefix + "&r " + str);
     }
 
+    public static String prefix(String str, Player player) {
+        return prefix(str).replaceAll("%player%", player.getName());
+    }
+
     public static String color(String str) {
         if(str == null) return null;
         return ChatColor.translateAlternateColorCodes('&', str);
+    }
+
+    public static String color(String str, Player player) {
+        if(str == null) return null;
+        return ChatColor.translateAlternateColorCodes('&', str).replaceAll("%player%", player.getName());
     }
 
     public static String[] colorArr(String[] arr) {

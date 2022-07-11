@@ -75,13 +75,14 @@ public class TradeView {
                 List<net.minecraft.world.item.ItemStack> items = (List<net.minecraft.world.item.ItemStack>)
                         ReflectUtils.getField(packet, "c");
                 for (int i = 0; i < items.size(); i++) {
+                    if(TradeUtils.isMiddle(i)) continue;
                     ItemStack slotDisplayItem = CraftItemStack.asBukkitCopy(items.get(i));
-                    if (!TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isOtherTraderSlot(i) && !TradeUtils.isMiddle(i))
-                        if (trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(i))
-                            slotDisplayItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(i));
-                    else if (!TradeUtils.isMiddle(i))
-                        if (partner.getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(i))
+                    boolean otherTraderSlot = TradeUtils.isOtherTraderSlot(i);
+
+                    if (otherTraderSlot && partner.getOfferedItems().size() > TradeUtils.convertOtherSlotToTradeIndex(i))
                             slotDisplayItem = partner.getOfferedItems().get(TradeUtils.convertOtherSlotToTradeIndex(i));
+                    else if (trader.getOfferedItems().size() > TradeUtils.convertSlotToTradeIndex(i))
+                            slotDisplayItem = trader.getOfferedItems().get(TradeUtils.convertSlotToTradeIndex(i));
 
                     net.minecraft.world.item.ItemStack display = CraftItemStack.asNMSCopy(slotDisplayItem);
                     items.set(i, display);

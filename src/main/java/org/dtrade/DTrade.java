@@ -12,6 +12,7 @@ import org.dtrade.gui.management.GuiManager;
 import org.dtrade.logging.TradeLogger;
 import org.dtrade.packets.PacketHandler;
 import org.dtrade.packets.TradeView;
+import org.dtrade.util.ListenerShiftRightClick;
 
 import java.io.File;
 
@@ -36,17 +37,17 @@ public class DTrade extends JavaPlugin {
         TradeView.init();
 
         getServer().getPluginManager().registerEvents(new GuiManager(), this);
+        getServer().getPluginManager().registerEvents(new ListenerShiftRightClick(this), this);
 
         getCommand("trade").setExecutor(new CommandTrade(this));
         getCommand("tradelog").setExecutor(new CommandTradeLog());
 
     }
 
-
-
     @Override
     public void onDisable() {
         Bukkit.getOnlinePlayers().forEach(p -> ((CraftPlayer) p).getHandle().b.a.m.pipeline().remove("dpackethandler"));
     }
+
 
 }

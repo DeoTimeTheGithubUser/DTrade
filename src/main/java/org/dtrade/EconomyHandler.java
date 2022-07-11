@@ -11,14 +11,13 @@ public class EconomyHandler {
     @Getter
     private final Economy economy;
 
-    private EconomyHandler(Plugin plugin){
+    private EconomyHandler(final Plugin plugin){
         this.plugin = plugin;
         this.economy = initEconomy();
     }
 
     private Economy initEconomy() {
         RegisteredServiceProvider<Economy> econProvider = plugin.getServer().getServicesManager().getRegistration(Economy.class);
-        System.out.println("provider is: " + econProvider);
         return econProvider == null ? null : econProvider.getProvider();
     }
 

@@ -14,6 +14,7 @@ import org.dtrade.api.events.TradeRequestEvent;
 import org.dtrade.config.DTradeConfig;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.TradeCouple;
+import org.dtrade.trade.TradeRequest;
 import org.dtrade.trade.Trader;
 import org.dtrade.util.ChatUtils;
 
@@ -22,8 +23,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class CommandTrade implements CommandExecutor {
-
-    private HashMap<UUID, UUID> requests = new HashMap<>();
 
     private final Plugin plugin;
 
@@ -35,41 +34,13 @@ public class CommandTrade implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        Player requested = Bukkit.getPlayer(args[0]);
+        Player requested = Bukkit.getPlayerExact(args[0]);
 
         if (requested == null) {
             sender.sendMessage("\u00a7cIncorrect usage. /trade <player>");
             return true;
         }
-
-        if (player.getUniqueId().equals(requested.getUniqueId())) {
-            sender.sendMessage(DTradeConfig.prefix(DTradeConfig.getCantTradeSelf()));
-            return true;
-        }
-
-        if (requests.containsKey(player.getUniqueId())) {
-            sender.sendMessage("\u00a7cYou already have an outgoing request.");
-            return true;
-        }
-
-        if (requests.containsKey(requested.getUniqueId())) {
-            Trade trade = Trade.createTrade(plugin, TradeCouple.of(Trader.createTrader(player), Trader.createTrader(requested)));
-            trade.initializeTrade();
-            requests.remove(requested.getUniqueId());
-            return true;
-        }
-
-        TradeRequestEvent requestEvent = new TradeRequestEvent(player, requested);
-        Bukkit.getPluginManager().callEvent(requestEvent);
-        if(requestEvent.isCancelled()) return true;
-        requests.put(player.getUniqueId(), requested.getUniqueId());
-        player.sendMessage("\u00a7aYou sent a trade request to " + args[0] + ".");
-
-        String sendMessage = "\u00a7aYou received a trade request from " + sender.getName() + ".";
-        TextComponent component = ChatUtils.createCommandMessage(sendMessage, "/trade " + player.getName());
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("\u00a7aClick to accept trade!")));
-        requested.spigot().sendMessage(component);
-
+        TradeRequest.createTradeRequest(plugin, player, requested);
         return true;
     }
 
