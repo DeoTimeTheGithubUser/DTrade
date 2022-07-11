@@ -1,5 +1,6 @@
 package org.dtrade.trade;
 
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -38,9 +39,16 @@ public class TradeRequest {
         initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getSentRequestTo(), requested));
 
         String sendMessage = DTradeConfig.prefix(DTradeConfig.getReceivedRequestFrom(), initializer);
-        TextComponent component = ChatUtils.createCommandMessage(sendMessage, "/trade " + initializer.getName());
+        TextComponent component = new TextComponent(sendMessage);
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/trade " + initializer.getName()));
         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("\u00a7aClick to accept trade!")));
         requested.spigot().sendMessage(component);
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            requests.remove(requested.getUniqueId());
+            if(initializer.isOnline()) initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getRequestToExpired()));
+            if(requested.isOnline()) requested.sendMessage(DTradeConfig.prefix(DTradeConfig.getRequestFromExpired()));
+        }, DTradeConfig.getSecondsUntilRequestTimeout() * 20L);
     }
 
 }

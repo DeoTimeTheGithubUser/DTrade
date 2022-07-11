@@ -11,13 +11,22 @@ import java.util.function.Supplier;
 public class DTradeConfig implements Config {
 
     // trade
-    @ConfigPath("trade.shift_right_click_enabled") @Getter
-    private static boolean shiftRightClickEnabled = true;
+
     @ConfigPath("trade.seconds_until_accept") @Getter
     private static int secondsUntilAccept = 5;
 
     @ConfigPath("trade.trade_gui_title") @Getter
     private static String tradeGuiTitle = "Trading with %player%";
+
+    @ConfigPath("trade.request.shift_right_click_enabled") @Getter
+    private static boolean shiftRightClickEnabled = true;
+    @ConfigPath("trade.request.seconds_until_request_timeout") @Getter
+    private static int secondsUntilRequestTimeout = 10;
+    @ConfigPath("trade.request.request_to_expired") @Getter
+    private static String requestToExpired = "&cThe trade request to %player% has expired.";
+    @ConfigPath("trade.request.request_from_expired") @Getter
+    private static String requestFromExpired = "&cThe trade request from %player% has expired.";
+
 
     @ConfigPath("trade.coin_input.minimum_coin_input") @Getter
     private static long minCoinInput = 0;
@@ -35,9 +44,9 @@ public class DTradeConfig implements Config {
 
     @ConfigPath("trade.blacklisted.blacklisted_message") @Getter
     private static String blacklistedMessage = "&cThat item is blacklisted from trading!";
-    @ConfigPath("trade.blacklisted.blacklisted_names") @Getter @ConfigComments("Any item with a blacklisted material will not be able to be traded.")
-    private static Material[] blacklistedMaterials = new Material[]{};
-    @ConfigPath("trade.blacklisted.blacklisted_materials") @Getter @ConfigComments("Any item with a name that matches one of the regex will not be able to be traded.")
+    @ConfigPath("trade.blacklisted.blacklisted_materials") @Getter @ConfigComments("Any item with a blacklisted material will not be able to be traded.")
+    private static String[] blacklistedMaterials = new String[]{};
+    @ConfigPath("trade.blacklisted.blacklisted_names") @Getter @ConfigComments("Any item with a name that matches one of the regex will not be able to be traded.")
     private static String[] blacklistedNames = new String[]{};
     @ConfigPath("trade.blacklisted.blacklisted_lore") @Getter @ConfigComments("Any item with a line of lore that matches one of the regex will not be able to be traded.")
     private static String[] blacklistedLore = new String[]{};
