@@ -62,10 +62,8 @@ public class TradeLogger {
     }
 
     public TradeLog[] getTradeLogs(UUID player) {
-        return logs.stream().filter(log -> {
-            Couple<OfflinePlayer> players = log.getTraders();
-            return players.getFirst().getUniqueId().equals(player) || players.getSecond().getUniqueId().equals(player);
-        }).sorted(Comparator.comparing(TradeLog::getDate).reversed()).toArray(TradeLog[]::new);
+        return logs.stream().filter(log -> log.getTraders().oneMeets(t -> t.getUniqueId().equals(player)))
+                .sorted(Comparator.comparing(TradeLog::getDate).reversed()).toArray(TradeLog[]::new);
     }
 
     @SneakyThrows
