@@ -21,9 +21,6 @@ import java.util.Set;
 
 public class PacketHandler {
 
-    @Getter
-    private static PacketHandler packetHandler;
-
     private final Map<Class<? extends Packet<?>>, Set<PacketReadSubscriber<? extends Packet<?>>>> readers = new HashMap<>();
     private final Map<Class<? extends Packet<?>>, Set<PacketWriteSubscriber<? extends Packet<?>>>> writers = new HashMap<>();
 

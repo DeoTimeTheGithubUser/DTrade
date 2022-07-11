@@ -32,7 +32,7 @@ public interface Config {
             }
             else {
                 Object value = fileConfig.get(path.value());
-                if(value instanceof List<?> list) value = list.toArray((Object[]) Array.newInstance(list.get(0).getClass(), 0));
+                if(value instanceof List<?> list) value = list.toArray((Object[]) Array.newInstance(field.getType().getComponentType(), 0));
                 field.set(null, value);
             }
         }

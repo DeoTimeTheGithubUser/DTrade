@@ -37,7 +37,7 @@ public class DTradeConfig implements Config {
     private static String blacklistedMessage = "&cThat item is blacklisted from trading!";
     @ConfigPath("trade.blacklisted.blacklisted_names") @Getter @ConfigComments("Any item with a blacklisted material will not be able to be traded.")
     private static Material[] blacklistedMaterials = new Material[]{};
-    @ConfigPath("trade.blacklisted.blacklisted_names") @Getter @ConfigComments("Any item with a name that matches one of the regex will not be able to be traded.")
+    @ConfigPath("trade.blacklisted.blacklisted_materials") @Getter @ConfigComments("Any item with a name that matches one of the regex will not be able to be traded.")
     private static String[] blacklistedNames = new String[]{};
     @ConfigPath("trade.blacklisted.blacklisted_lore") @Getter @ConfigComments("Any item with a line of lore that matches one of the regex will not be able to be traded.")
     private static String[] blacklistedLore = new String[]{};

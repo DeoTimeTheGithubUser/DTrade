@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.plugin.Plugin;
+import org.dtrade.DTrade;
 import org.dtrade.util.ReflectUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class SignInput {
 
-    private final Plugin plugin;
+    private final DTrade plugin;
     private final Player player;
     private final String[] prompt;
     private final CompletableFuture<String[]> cb;
@@ -46,7 +47,7 @@ public class SignInput {
         }
     };
 
-    private SignInput(Plugin plugin, Player player, String[] prompt, CompletableFuture<String[]> cb) {
+    private SignInput(DTrade plugin, Player player, String[] prompt, CompletableFuture<String[]> cb) {
         this.plugin = plugin;
         this.player = player;
         this.prompt = prompt;
@@ -80,13 +81,13 @@ public class SignInput {
         ((CraftPlayer) player).getHandle().b.a(blockPacket);
         ((CraftPlayer) player).getHandle().b.a(sign.c());
         ((CraftPlayer) player).getHandle().b.a(signPacket);
-        PacketHandler.getPacketHandler().subscribe(PacketPlayInUpdateSign.class, (PacketHandler.PacketReadSubscriber<PacketPlayInUpdateSign>) (player, packet) -> {
+        plugin.getPacketHandler().subscribe(PacketPlayInUpdateSign.class, (PacketHandler.PacketReadSubscriber<PacketPlayInUpdateSign>) (player, packet) -> {
             if(valid) Bukkit.getScheduler().runTask(plugin, () -> cb.complete(packet.c()));
             valid = false;
         });
     }
 
-    public static @NotNull CompletableFuture<String[]> requestSignInput (@NotNull Plugin plugin, Player player, String[] prompt) {
+    public static @NotNull CompletableFuture<String[]> requestSignInput (@NotNull DTrade plugin, Player player, String[] prompt) {
         CompletableFuture<String[]> future = new CompletableFuture<>();
         new SignInput(plugin, player, prompt, future);
         return future;

@@ -22,8 +22,8 @@ import java.util.List;
 public class TradeView {
 
     private TradeView(DTrade plugin) {
-        PacketHandler.getPacketHandler().subscribe(PacketPlayOutSetSlot.class, getSetSlotWriter(plugin));
-        PacketHandler.getPacketHandler().subscribe(PacketPlayOutWindowItems.class, getWindowItemsWriter(plugin));
+        plugin.getPacketHandler().subscribe(PacketPlayOutSetSlot.class, getSetSlotWriter(plugin));
+        plugin.getPacketHandler().subscribe(PacketPlayOutWindowItems.class, getWindowItemsWriter(plugin));
     }
 
     private PacketHandler.PacketWriteSubscriber<PacketPlayOutSetSlot> getSetSlotWriter(DTrade plugin) {
