@@ -32,12 +32,10 @@ public class CommandTrade implements CommandExecutor {
             sender.sendMessage("\u00a7cPlease enter a username to trade.");
             return true;
         }
-
         Player player = (Player) sender;
         Player requested = Bukkit.getPlayerExact(args[0]);
-
         if (requested == null) {
-            sender.sendMessage("\u00a7cIncorrect usage. /trade <player>");
+            sender.sendMessage(DTradeConfig.prefix(DTradeConfig.getPlayerRequestedNotExist()));
             return true;
         }
         TradeRequest.createTradeRequest(plugin, player, requested);

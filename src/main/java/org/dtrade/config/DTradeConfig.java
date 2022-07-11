@@ -21,9 +21,11 @@ public class DTradeConfig implements Config {
     private static String[] prompt = new String[]{"", "^^^^^^^^^^^^^^", "Enter coins to", "offer in trade."};
 
 
+    // messages
     @ConfigPath("messages.prefix") @Getter
     private static String prefix = "&a[&eDTrade&a]";
 
+    // errors
     @ConfigPath("messages.errors.not_enough_coins") @Getter
     private static String notEnoughCoins = "&cNot enough coins!";
     @ConfigPath("messages.errors.invalid_coins") @Getter
@@ -34,6 +36,10 @@ public class DTradeConfig implements Config {
     private static String otherCancelledTrade = "&c%player% cancelled the trade!";
     @ConfigPath("messages.errors.cant_trade_self") @Getter
     private static String cantTradeSelf = "&cYou cannot trade yourself!";
+    @ConfigPath("messages.errors.player_requested_not_exist") @Getter
+    private static String playerRequestedNotExist = "&cThat player is not online!";
+    @ConfigPath("messages.errors.already_outgoing_request") @Getter
+    private static String alreadyOutgoingRequest = "&cYou already have an outgoing request!";
 
     private static <T> T make(Supplier<T> sup) {
         return sup.get();
