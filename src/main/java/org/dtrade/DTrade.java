@@ -22,6 +22,13 @@ public class DTrade extends JavaPlugin {
 
     @Getter
     private File loggerFile;
+    @Getter
+    private TradeLogger tradeLogger;
+    @Getter
+    private EconomyHandler economyHandler;
+    @Getter
+    private PacketHandler packetHandler;
+
 
     @Override
     public void onEnable() {
@@ -30,17 +37,16 @@ public class DTrade extends JavaPlugin {
         loggerFile = new File(this.getDataFolder(), "logs.json");
 
         Config.load(this, DTradeConfig.class);
-        PacketHandler.init(this);
-        Bukkit.getOnlinePlayers().forEach(PacketHandler.getPacketHandler()::registerPlayer);
-        EconomyHandler.init(this);
-        TradeLogger.init(this);
-        TradeView.init();
+        this.packetHandler = new PacketHandler(this);
+        this.economyHandler = new EconomyHandler(this);
+        this.tradeLogger = new TradeLogger(this);
+        TradeView.init(this);
 
         getServer().getPluginManager().registerEvents(new GuiManager(), this);
         getServer().getPluginManager().registerEvents(new ListenerShiftRightClick(this), this);
 
         getCommand("trade").setExecutor(new CommandTrade(this));
-        getCommand("tradelog").setExecutor(new CommandTradeLog());
+        getCommand("tradelog").setExecutor(new CommandTradeLog(this));
 
     }
 

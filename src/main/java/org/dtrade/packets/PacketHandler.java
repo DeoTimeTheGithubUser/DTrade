@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import lombok.Getter;
 import net.minecraft.network.protocol.Packet;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,8 +27,9 @@ public class PacketHandler {
     private final Map<Class<? extends Packet<?>>, Set<PacketReadSubscriber<? extends Packet<?>>>> readers = new HashMap<>();
     private final Map<Class<? extends Packet<?>>, Set<PacketWriteSubscriber<? extends Packet<?>>>> writers = new HashMap<>();
 
-    private PacketHandler(@NotNull Plugin plugin) {
+    public PacketHandler(@NotNull Plugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(packetListener, plugin);
+        Bukkit.getOnlinePlayers().forEach(this::registerPlayer);
     }
 
     public <T extends Packet<?>> void subscribe(Class<T> packet, PacketReadSubscriber<T> subscriber) {
@@ -71,10 +73,6 @@ public class PacketHandler {
                 super.write(ctx, msg, promise);
             }
         });
-    }
-
-    public static void init(Plugin plugin) {
-        packetHandler = new PacketHandler(plugin);
     }
 
 }

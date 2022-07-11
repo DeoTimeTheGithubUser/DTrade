@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.dtrade.DTrade;
 import org.dtrade.EconomyHandler;
 import org.dtrade.api.events.TradeCancelEvent;
 import org.dtrade.api.events.TradeCompleteEvent;
@@ -31,7 +32,7 @@ public class Trade {
 
     private final UUID tradeID = UUID.randomUUID();
 
-    private final Plugin plugin;
+    private final DTrade plugin;
     private final TradeCouple couple;
 
     private boolean cancelled;
@@ -39,7 +40,7 @@ public class Trade {
     private int secondsUntilAccept = -1;
     private BukkitRunnable timer;
 
-    public Trade(Plugin plugin, TradeCouple couple) {
+    public Trade(DTrade plugin, TradeCouple couple) {
         this.plugin = plugin;
         this.couple = couple;
     }
@@ -70,7 +71,7 @@ public class Trade {
         });
     }
 
-    public static @NotNull Trade createTrade(Plugin plugin, TradeCouple couple) {
+    public static @NotNull Trade createTrade(DTrade plugin, TradeCouple couple) {
         Trade trade = new Trade(plugin, couple);
         trades.add(trade);
         couple.both(t -> t.setTrade(trade));
@@ -134,7 +135,7 @@ public class Trade {
             return;
         }
 
-        Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
+        Economy eco = plugin.getEconomyHandler().getEconomy();
 
         if(!couple.bothMeet(t -> t.hasCoins(t.getOfferedCoins()))) {
             cancel(null);
@@ -160,7 +161,7 @@ public class Trade {
         });
         couple.both(t -> t.getPlayer().closeInventory());
         trades.removeIf(t -> t.getCouple().equals(couple));
-        TradeLogger.getLogger().log(TradeLog.createLog(this));
+        plugin.getTradeLogger().log(TradeLog.createLog(this));
     }
 
 }

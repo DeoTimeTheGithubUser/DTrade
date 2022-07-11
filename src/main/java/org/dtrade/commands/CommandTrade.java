@@ -6,17 +6,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.dtrade.DTrade;
 import org.dtrade.config.DTradeConfig;
 import org.dtrade.trade.TradeRequest;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class CommandTrade implements CommandExecutor {
 
-    private final Plugin plugin;
+    private final DTrade plugin;
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (args.length == 0) {
             sender.sendMessage(DTradeConfig.prefix(DTradeConfig.getNoUsernameEntered()));
             return true;

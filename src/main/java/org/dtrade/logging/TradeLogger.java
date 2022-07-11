@@ -5,13 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.dtrade.DTrade;
 import org.dtrade.api.events.TradeLogAddedEvent;
-import org.dtrade.util.Couple;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -24,14 +21,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TradeLogger {
-    @Getter
-    private static TradeLogger logger;
 
     private final DTrade plugin;
     private final Set<TradeLog> logs;
 
     @SneakyThrows
-    private TradeLogger(@NotNull DTrade plugin) {
+    public TradeLogger(@NotNull DTrade plugin) {
         if(!plugin.getLoggerFile().exists()) {
             plugin.getDataFolder().mkdirs();
             plugin.getLoggerFile().createNewFile();
@@ -79,7 +74,4 @@ public class TradeLogger {
         }
     }
 
-    public static void init(DTrade plugin) {
-        logger = new TradeLogger(plugin);
-    }
 }

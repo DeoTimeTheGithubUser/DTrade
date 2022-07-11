@@ -43,7 +43,7 @@ public class Trader {
     }
 
     public boolean hasCoins(double amount) {
-        Economy eco = EconomyHandler.getEconomyHandler().getEconomy();
+        Economy eco = trade.getPlugin().getEconomyHandler().getEconomy();
         double bal = eco.getBalance(getPlayer());
         return bal >= amount;
     }

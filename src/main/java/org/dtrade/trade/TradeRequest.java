@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.dtrade.DTrade;
 import org.dtrade.api.events.TradeRequestEvent;
 import org.dtrade.config.DTradeConfig;
 import org.dtrade.util.ChatUtils;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public class TradeRequest {
 
     private static final HashMap<UUID, UUID> requests = new HashMap<>();
-    public static void createTradeRequest(Plugin plugin, Player initializer, Player requested) {
+    public static void createTradeRequest(DTrade plugin, Player initializer, Player requested) {
 
         if (requests.containsKey(initializer.getUniqueId())) {
             initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getAlreadyOutgoingRequest()));

@@ -20,6 +20,7 @@ import org.dtrade.gui.management.Gui;
 import org.dtrade.packets.SignInput;
 import org.dtrade.trade.Trade;
 import org.dtrade.trade.Trader;
+import org.dtrade.util.Blacklisted;
 import org.dtrade.util.ItemUtils;
 import org.dtrade.util.TradeUtils;
 
@@ -60,7 +61,8 @@ public class GuiTrade extends Gui {
                 } catch (NumberFormatException ex) {
                     valid = false;
                 }
-                if(valid && amount < 0) valid = false;
+                if(valid && (amount < DTradeConfig.getMinCoinInput() || amount > DTradeConfig.getMaxCoinInput())) valid = false;
+
 
                 int windowID = ((CraftPlayer) trader.getPlayer()).getHandle().bV.j;
                 Containers<?> type = ((CraftPlayer) trader.getPlayer()).getHandle().bV.a();
@@ -87,6 +89,11 @@ public class GuiTrade extends Gui {
         if (event.getClickedInventory().equals(trader.getPlayer().getInventory())) {
             ItemStack offeredItem = event.getCurrentItem();
             if(offeredItem == null) return;
+
+            if(Blacklisted.isItemBlacklisted(offeredItem)) {
+                trader.getPlayer().sendMessage(DTradeConfig.prefix(DTradeConfig.getBlacklistedMessage()));
+                return;
+            }
 
             TradeAddItemEvent addItemEvent = new TradeAddItemEvent(trader, offeredItem);
             Bukkit.getPluginManager().callEvent(addItemEvent);

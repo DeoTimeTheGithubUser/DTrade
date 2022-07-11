@@ -11,7 +11,7 @@ public class EconomyHandler {
     @Getter
     private final Economy economy;
 
-    private EconomyHandler(final Plugin plugin){
+    public EconomyHandler(final Plugin plugin){
         this.plugin = plugin;
         this.economy = initEconomy();
     }
@@ -23,14 +23,6 @@ public class EconomyHandler {
 
     public boolean supportsEconomy() {
         return economy != null;
-    }
-    
-
-    @Getter
-    private static EconomyHandler economyHandler;
-
-    public static void init(Plugin plugin) {
-        economyHandler = new EconomyHandler(plugin);
     }
 
 }

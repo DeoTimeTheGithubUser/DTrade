@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.dtrade.DTrade;
 import org.dtrade.gui.management.Gui;
 import org.dtrade.logging.TradeLog;
 import org.dtrade.logging.TradeLogger;
@@ -19,24 +20,26 @@ import java.util.UUID;
 
 public class GuiTradeLogs extends Gui {
 
+    private final DTrade plugin;
     private final UUID target;
     private final int page;
     private final Map<Integer, TradeLog> logMap = new HashMap<>();
 
-    public GuiTradeLogs(UUID playerUUID, int page) {
+    public GuiTradeLogs(DTrade plugin, UUID playerUUID, int page) {
         super("Trade logs of " + Bukkit.getOfflinePlayer(playerUUID).getName(), 54);
+        this.plugin = plugin;
         this.target = playerUUID;
         this.page = page;
         initGuis();
     }
 
-    public GuiTradeLogs(OfflinePlayer player) {
-        this(player.getUniqueId(), 0);
+    public GuiTradeLogs(DTrade plugin, OfflinePlayer player) {
+        this(plugin, player.getUniqueId(), 0);
     }
 
     private void initGuis() {
 
-        TradeLog[] logs = TradeLogger.getLogger().getTradeLogs(target);
+        TradeLog[] logs = plugin.getTradeLogger().getTradeLogs(target);
 
         for(int i = 45; i <= 53; i++) setItem(i, ItemUtils.createMenuGlass());
         int offset = page * 45;
@@ -57,10 +60,10 @@ public class GuiTradeLogs extends Gui {
         event.setCancelled(true);
         int slot = event.getRawSlot();
         if (slot == 48 && page != 0) {
-            event.getWhoClicked().openInventory(new GuiTradeLogs(target, page - 1));
+            event.getWhoClicked().openInventory(new GuiTradeLogs(plugin, target, page - 1));
             return;
         } else if (slot == 50 && firstEmpty() == -1) {
-            event.getWhoClicked().openInventory(new GuiTradeLogs(target, page + 1));
+            event.getWhoClicked().openInventory(new GuiTradeLogs(plugin, target, page + 1));
             return;
         } else if (slot == 49) {
             event.getWhoClicked().closeInventory();
