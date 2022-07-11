@@ -1,6 +1,5 @@
 package org.dtrade.config;
 
-import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

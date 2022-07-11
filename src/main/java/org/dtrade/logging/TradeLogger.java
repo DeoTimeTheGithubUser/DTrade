@@ -1,6 +1,8 @@
 package org.dtrade.logging;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
@@ -15,8 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TradeLogger {

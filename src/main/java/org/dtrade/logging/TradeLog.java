@@ -1,13 +1,10 @@
 package org.dtrade.logging;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_18_R2.CraftOfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -30,14 +27,14 @@ public class TradeLog implements Serializable {
     private static final Base64.Decoder decoder = Base64.getDecoder();
 
     @Getter
-    private Date date;
+    private final Date date;
 
     @Getter
-    private Couple<OfflinePlayer> traders;
+    private final Couple<OfflinePlayer> traders;
     @Getter
-    private Couple<ItemStack[]> items;
+    private final Couple<ItemStack[]> items;
     @Getter
-    private Couple<Long> coins;
+    private final Couple<Long> coins;
 
     public TradeLog(Date date, Couple<OfflinePlayer> traders, Couple<ItemStack[]> items, Couple<Long> coins) {
         this.date = date;

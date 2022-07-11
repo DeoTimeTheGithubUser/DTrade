@@ -1,9 +1,7 @@
 package org.dtrade.util;
 
 import lombok.SneakyThrows;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.dtrade.api.events.TradeAddItemEvent;
 
 import java.lang.reflect.Field;
 

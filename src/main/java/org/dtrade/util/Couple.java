@@ -19,7 +19,7 @@ public interface Couple<T> {
 
     default T other(T t) {
         return t.equals(getFirst()) ? getSecond() : getFirst();
-    };
+    }
 
     default boolean oneMeets(Predicate<T> pred) {
         return pred.test(getFirst()) || pred.test(getSecond());

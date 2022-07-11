@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class TradeRequest {
 
-    private static HashMap<UUID, UUID> requests = new HashMap<>();
+    private static final HashMap<UUID, UUID> requests = new HashMap<>();
     public static void createTradeRequest(Plugin plugin, Player initializer, Player requested) {
 
         if (requests.containsKey(initializer.getUniqueId())) {
