@@ -125,7 +125,6 @@ public class Trade {
     }
 
     private void confirmTrade() {
-        Bukkit.broadcastMessage("I AM TRIGGERED! GLITCH");
 
         TradeCompleteEvent completeEvent = new TradeCompleteEvent(this);
         Bukkit.getPluginManager().callEvent(completeEvent);
