@@ -46,8 +46,8 @@ public class TradeRequest {
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             requests.remove(requested.getUniqueId());
-            if(initializer.isOnline()) initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getRequestToExpired()));
-            if(requested.isOnline()) requested.sendMessage(DTradeConfig.prefix(DTradeConfig.getRequestFromExpired()));
+            if(initializer.isOnline()) initializer.sendMessage(DTradeConfig.prefix(DTradeConfig.getRequestToExpired(), requested));
+            if(requested.isOnline()) requested.sendMessage(DTradeConfig.prefix(DTradeConfig.getRequestFromExpired(), initializer));
         }, DTradeConfig.getSecondsUntilRequestTimeout() * 20L);
     }
 
